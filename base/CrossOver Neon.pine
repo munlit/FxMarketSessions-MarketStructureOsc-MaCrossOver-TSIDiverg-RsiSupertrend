@@ -1,0 +1,409 @@
+/// ╔═══════════════════════════════╗
+/// ║ 	CrossOver Neon				║
+/// ║ 	@	Ultr.					║
+/// ╚═══════════════════════════════╝
+
+//@version=5
+indicator("CrossOver Neon (@Ultr)", shorttitle = "CrossOver(@Ultr.)", overlay = true)
+
+//// ───────────────────────
+/// ─── Neon ────────
+/// ─── Colors ──────
+//// ───────────────────────
+
+/// ─── Standard ──
+	// color.aqua								= #00BCD4
+	// color.blue								= #2196F3
+	// color.teal								= #00897B
+	// color.green								= #4CAF50
+	// color.olive								= #808000
+	// color.lime								= #00E676
+	// color.yellow								= #FFEB3B
+	// color.orange								= #FF9800
+	// color.maroon								= #880E4F
+	// color.red								= #FF5252
+	// color.fuchsia							= #E040FB
+	// color.purple								= #9C27B0
+	// color.navy								= #311B92
+	// color.black								= #363A45
+	// color.gray								= #787B86
+	// color.silver								= #B2B5BE
+	// color.white								= #FFFFFF
+
+/// ─── Ameritrade ───
+	// AmeTrWhite								= #FFFFFF								// AmeritradeWhite
+	// AmeTrGrayPlatinum						= #F7F7F7								// AmeritradeGrayPlatinum
+	// AmeTrGrayNickel							= #F1F1F1								// AmeritradeGrayNickel
+	// AmeTrGrayNickelDark20					= #C0C0C0								// AmeritradeGrayNickelDark20
+	// AmeTrGrayAluminum						= #E6E7E9								// AmeritradeGrayAluminum
+	// AmeTrGrayAsh								= #D8D8D8								// AmeritradeGrayAsh
+	// AmeTrGrayStone							= #999999								// AmeritradeGrayStone
+	// AmeTrGrayIron							= #666666								// AmeritradeGrayIron
+	// AmeTrGrayCharcoal						= #333333								// AmeritradeGrayCharcoal
+	// AmeTrBlack								= #000000								// AmeritradeBlack
+	// AmeTrGreenCabbage						= #EBF6E9								// AmeritradeGreenCabbage
+	// AmeTrGreenVerdeLight70					= #B4D6B2								// AmeritradeGreenVerdeLight70
+	// AmeTrGreenVerdeLight50					= #83BC7F								// AmeritradeGreenVerdeLight50
+	// AmeTrGreenVerdeNat						= #40a829								// AmeritradeGreenVerdeNat
+	// AmeTrGreenVerdeLight20					= #399333								// AmeritradeGreenVerdeLight20
+	// AmeTrGreenVerde							= #087900								// AmeritradeGreenVerde
+	// AmeTrGreenVerdeDark20					= #066000								// AmeritradeGreenVerdeDark20
+	// AmeTrGreenMoss							= #BEE7D3								// AmeritradeGreenMoss
+	// AmeTrGreenMint							= #6DC4BC								// AmeritradeGreenMint
+	// AmeTrGreenPine							= #38635A								// AmeritradeGreenPine
+	// AmeTrRedRose								= #FAD1CF								// AmeritradeRedRose
+	// AmeTrRedRojaLight50						= #E08988								// AmeritradeRedRojaLight50
+	// AmeTrRedRojaLight20						= #CD4241								// AmeritradeRedRojaLight20
+	// AmeTrRedRoja								= #C11312								// AmeritradeRedRoja
+	// AmeTrRedRojaDark20						= #940F0E								// AmeritradeRedRojaDark20
+	// AmeTrorangePeach							= #FCE7CA								// AmeritradeorangePeach
+	// AmeTrorangeCarrot						= #ED8902								// AmeritradeorangeCarrot
+	// AmeTrorangeYam							= #BD5310								// AmeritradeorangeYam
+	// AmeTrblueFrost							= #E1EEF9								// AmeritradeblueFrost
+	// AmeTrblueLagoon							= #316486								// AmeritradeblueLagoon
+	// AmeTrblueNavy							= #2A5673								// AmeritradeblueNavy
+	// AmeTrblueNcean							= #64A1C6								// AmeritradeblueNcean
+	// AmeTrpurpleEggPlant						= #732181								// AmeritradepurpleEggPlant
+
+/// ─── Axi ───
+	// AxiPrimary								= #fc404d								// AxiPrimary
+	// AxiSecondary								= #282424								// AxiSecondary
+	// AxiAccent								= #61ce70								// AxiAccent
+	// Axi7a46f22								= #d11c36								// Axi7a46f22
+	// Axi1519066c								= #fc404d								// Axi1519066c
+	// Axi3d4fa1a1								= #f0ebe3								// Axi3d4fa1a1
+	// Axi638b46c1								= #fcd758								// Axi638b46c1
+	// Axid07bac9								= #f9b4a8								// Axid07bac9
+	// Axie63a114								= #2c4d5a								// Axie63a114
+	// Axi8bf0845								= #a4d866								// Axi8bf0845
+	// Axi75c6da1								= #282424								// Axi75c6da1
+	// Axi378280f								= #45c2c7								// Axi378280f
+	// Axi4de92c5								= #6caddf								// Axi4de92c5
+	// Axi413dab8			   					= #00275D					            // Axi413dab8
+	// Axib3fab89								= #55165c								// Axib3fab89
+	// Axi548138f								= #45c2c7								// Axi548138f
+	// Axi5ed9920								= #ea1616								// Axi5ed9920
+	// Axi70f7335								= #dd0606								// Axi70f7335
+
+/// ─── GrayScale ───
+	// GraySFocus								= #2d7aed								// GrayScaleFocus
+	// GraySWhite								= #fff									// GrayScaleWhite
+	// GraySBlack								= #000									// GrayScaleBlack
+	// GraySPrimaryBlackberry					= #2e234b								// GrayScalePrimaryBlackberry
+	// GraySPrimaryBlackberry40					= rgba(46, 35, 75, .4))			    	// GrayScalePrimaryBlackberry40
+	// GraySPrimaryBlackberry65					= rgba(46, 35, 75, .65))				// GrayScalePrimaryBlackberry65
+	// GraySPrimaryCoral						= #ffb198								// GrayScalePrimaryCoral
+	// GraySSecondaryForestGreen				= #244024								// GrayScaleSecondaryForestGreen
+	// GraySSecondaryKeyLime					= #b5ce6f								// GrayScaleSecondaryKeyLime
+	// GraySSecondaryLavender					= #c5bfe4								// GrayScaleSecondaryLavender
+	// GraySSecondaryLavender40					= rgba(197, 191, 228, .4))				// GrayScaleSecondaryLavender40
+	// GraySsecondaryLavender60					= rgba(197, 191, 228, .6))				// GrayScalesecondaryLavender60
+	// GrayShoverWhite							= #c0bdc9								// GrayScalehoverWhite
+	// GrayShoverBlackberry						= #42326b								// GrayScalehoverBlackberry
+	// GraySdisabledBlackberry					= #4d4466								// GrayScaledisabledBlackberry
+	// GraySactiveBlackberry					= #4d4466								// GrayScaleactiveBlackberry
+	// GrayShoverCcoral							= #ffcdbd								// GrayScalehoverCcoral
+	// GraySactiveCcoral						= #ff9e80								// GrayScaleactiveCcoral
+	// GrayShoverGray							= #827b93								// GrayScalehoverGray
+	// GrayShoverGray2							= #6d6581								// GrayScalehoverGray2
+	// GraySgrayCharcoal						= #282525								// GrayScalegrayCharcoal
+	// GraySgrayCharcoal70						= rgba(40, 37, 37, .7))			    	// GrayScalegrayCharcoal70
+	// GraySgrayCharcoal80						= rgba(40, 37, 37, .8))			    	// GrayScalegrayCharcoal80
+	// GraySgrayLight							= #f5f5f5								// GrayScalegrayLight
+	// GraySgrayMedium							= #eee									// GrayScalegrayMedium
+	// GraySgray70								= #696666								// GrayScalegray70
+	// GraySgrayDark							= #c1c1c1								// GrayScalegrayDark
+	// GraySwebSeasalt		   					= #FAFAFC								// GrayScalewebSeasalt
+	// GraySwebDivider							= #e9e7f1								// GrayScalewebDivider
+	// GraySwebBackground						= #f3f2fa								// GrayScalewebBackground
+	// GraySwebSecondaryText					= #77708a								// GrayScalewebSecondaryText
+	// GraySwebStroke							= #d3ceeb								// GrayScalewebStroke
+	// GraySwebErrors							= #e00000								// GrayScalewebErrors
+	// GraySwebService							= #2d7aed								// GrayScalewebService
+
+/// ─── Interactive ───
+	// IntAcPrimary3							= hsla(355, 85%, 46%, 0.03)		    	// InteractivePrimary3
+	// IntAcPrimary5							= hsla(355, 85%, 46%, 0.05)		    	// InteractivePrimary5
+	// IntAcPrimary10							= hsla(355, 85%, 46%, 0.10)		    	// InteractivePrimary10
+	// IntAcPrimary20							= hsla(355, 85%, 46%, 0.20)		    	// InteractivePrimary20
+	// IntAcPrimary30							= hsla(355, 85%, 46%, 0.30)		    	// InteractivePrimary30
+	// IntAcPrimary40							= hsla(355, 85%, 46%, 0.40)		    	// InteractivePrimary40
+	// IntAcPrimary50							= hsla(355, 85%, 46%, 0.50)		    	// InteractivePrimary50
+	// IntAcPrimary60							= hsla(355, 85%, 46%, 0.60)		    	// InteractivePrimary60
+	// IntAcPrimary70							= hsla(355, 85%, 46%, 0.70)		    	// InteractivePrimary70
+	// IntAcPrimary80							= hsla(355, 85%, 46%, 0.80)		    	// InteractivePrimary80
+	// IntAcPrimary90							= hsla(355, 85%, 46%, 0.90)		    	// InteractivePrimary90
+	// IntAcPrimary								= hsla(355, 85%, 46%, 1.0)				// InteractivePrimary
+	// IntAcPrimaryDark10						= hsla(355, 85%, 41%, 1.0)				// InteractivePrimaryDark10
+	// IntAcPrimaryDark20						= hsla(355, 85%, 36%, 1.0)				// InteractivePrimaryDark20
+	// IntAcPrimaryDark30						= hsla(355, 85%, 31%, 1.0)				// InteractivePrimaryDark30
+	// IntAcPrimaryDark40						= hsla(355, 85%, 26%, 1.0)				// InteractivePrimaryDark40
+	// IntAcPrimaryDark50						= hsla(355, 85%, 21%, 1.0)				// InteractivePrimaryDark50
+	// IntAcSecondary3							= hsla(0, 0%, 13%, 0.03)				// InteractiveSecondary3
+	// IntAcSecondary5							= hsla(0, 0%, 13%, 0.05)				// InteractiveSecondary5
+	// IntAcSecondary10							= hsla(0, 0%, 13%, 0.10)				// InteractiveSecondary10
+	// IntAcSecondary20							= hsla(0, 0%, 13%, 0.20)				// InteractiveSecondary20
+	// IntAcSecondary30							= hsla(0, 0%, 13%, 0.30)				// InteractiveSecondary30
+	// IntAcSecondary40							= hsla(0, 0%, 13%, 0.40)				// InteractiveSecondary40
+	// IntAcSecondary50							= hsla(0, 0%, 13%, 0.50)				// InteractiveSecondary50
+	// IntAcSecondary60							= hsla(0, 0%, 13%, 0.60)				// InteractiveSecondary60
+	// IntAcSecondary70							= hsla(0, 0%, 13%, 0.70)				// InteractiveSecondary70
+	// IntAcSecondary80							= hsla(0, 0%, 13%, 0.80)				// InteractiveSecondary80
+	// IntAcSecondary90							= hsla(0, 0%, 13%, 0.90)				// InteractiveSecondary90
+	// IntAcSecondary							= hsla(0, 0%, 13%, 1.0)			    	// InteractiveSecondary
+	// IntAcSecondaryDark10						= hsla(0, 0%, 10%, 1.0)			    	// InteractiveSecondaryDark10
+	// IntAcSecondaryDark20						= hsla(0, 0%, 7%, 1.0)					// InteractiveSecondaryDark20
+	// IntAcSecondaryDark30						= hsla(0, 0%, 4%, 1.0)					// InteractiveSecondaryDark30
+	// IntAcSecondaryDark40						= hsla(0, 0%, 1%, 1.0)					// InteractiveSecondaryDark40
+	// IntAcSecondaryDark50						= hsla(0, 0%, 0%, 1.0)					// InteractiveSecondaryDark50
+	// IntAcTertiary3							= hsla(202, 76%, 19%, 0.03)		    	// InteractiveTertiary3
+	// IntAcTertiary5							= hsla(202, 76%, 19%, 0.05)		    	// InteractiveTertiary5
+	// IntAcTertiary10							= hsla(202, 76%, 19%, 0.10)		    	// InteractiveTertiary10
+	// IntAcTertiary20							= hsla(202, 76%, 19%, 0.20)		    	// InteractiveTertiary20
+	// IntAcTertiary30							= hsla(202, 76%, 19%, 0.30)		    	// InteractiveTertiary30
+	// IntAcTertiary40							= hsla(202, 76%, 19%, 0.40)		    	// InteractiveTertiary40
+	// IntAcTertiary50							= hsla(202, 76%, 19%, 0.50)		    	// InteractiveTertiary50
+	// IntAcTertiary60							= hsla(202, 76%, 19%, 0.60)		    	// InteractiveTertiary60
+	// IntAcTertiary70							= hsla(202, 76%, 19%, 0.70)		    	// InteractiveTertiary70
+	// IntAcTertiary80							= hsla(202, 76%, 19%, 0.80)		    	// InteractiveTertiary80
+	// IntAcTertiary90							= hsla(202, 76%, 19%, 0.90)		    	// InteractiveTertiary90
+	// IntAcTertiary							= hsla(202, 76%, 19%, 1.0)				// InteractiveTertiary
+	// IntAcTertiaryDark10						= hsla(202, 76%, 14%, 1.0)				// InteractiveTertiaryDark10
+	// IntAcTertiaryDark20						= hsla(202, 76%, 9%, 1.0)				// InteractiveTertiaryDark20
+	// IntAcTertiaryDark30						= hsla(202, 76%, 4%, 1.0)				// InteractiveTertiaryDark30
+	// IntAcTertiaryDark40						= hsla(202, 76%, 0%, 1.0)				// InteractiveTertiaryDark40
+
+/// ─── Visa ───
+	// VisPrimary								= #1434CB								// VisaBrandPrimary
+	// VisPrimaryLight							= #3B57DE								// VisaBrandPrimaryLight
+	// VisPrimaryDark							= #021E4C								// VisaBrandPrimaryDark
+	// VisSecondary								= #FCC015								// VisaBrandSecondary
+	// VisSecondaryLight						= #FFD700								// VisaBrandSecondaryLight
+	// VisSecondaryDark							= #F7B600								// VisaBrandSecondaryDark
+	// VisTertiary7								= #2C2C2C								// VisaBrandTertiary7
+	// VisTertiary6								= #5C5C5C								// VisaBrandTertiary6
+	// VisTertiary5								= #979797								// VisaBrandTertiary5
+	// VisTertiary4								= #B9B9B9								// VisaBrandTertiary4
+	// VisTertiary3								= #DEDEDE								// VisaBrandTertiary3
+	// VisTertiary2								= #EEEEEE								// VisaBrandTertiary2
+	// VisTertiary1								= #F7F7F7								// VisaBrandTertiary1
+
+/// ─── Latam ───
+	// LatRedBackground							= rgb(232, 17, 75)						// Latam Red Background
+
+/// ─── Arbe Robotics ───
+ARoPrimary								= #0035FF								// ArbePrimary
+	// ARoPrimaryLight							= #0640FF								// ArbePrimaryLight
+	// ARoSecondary		   						= #04EBFF								// ArbeSecondary
+
+/// ─── AutoX ───
+	// AxPrimary								= #2253F0								// AutoXPrimary
+	// AxPrimaryLight							= #0050F9								// AutoXPrimaryLight
+	// AxSecondary								= #75ebc0								// AutoXSecondary
+
+/// ─── EEG ───
+	// EEGSkyBlue30								= #01EBF9								// EEGSkyBlue30
+	// EEGSkyBlue40								= #00E7FD								// EEGSkyBlue40
+	// EEGFucsia40								= #FF00B1								// EEGFucsia40
+	// EEGFucsia50								= #FE0CB6								// EEGFucsia50
+
+/// ─── Bright Line ───
+	// BrLiYel10								= #FBFD73								// BrightLineBackground Yellow Light
+	// BrLiYel20								= #FFFD52								// BrightLine Yellow Light
+	// BrLiYel30								= #FDF43C								// BrightLineB Yellow High
+	// BrLiYel40								= #FEF301								// BrightLineBackground Yellow Nit
+	// BrLiYel50								= #FFDB00								// BrightLineBackground Yellow Base
+
+/// ─── TradingView ───
+	// TVLightMenta50							= #00ffd5								// TradingViewMenta
+	// TVLightGreen50					    	= #33ffac								// TradingViewGreenNit
+	// TVBlue50									= #0034c5								// TradingViewBlue
+	// TVLightYellow50							= #eedd45								// TradingViewYellow
+	// TVNitRed40						   		= #e91e63								// TradingViewRedLight
+	// TVLightBlueSky50							= #12cef8								// TradingViewBlueSky
+
+/// ─── TFlab ───
+	// TFlAsia			    					= #8bbcfc								// Lite TFlabAsia                        
+	// TFlSydney		    					= #F0B884								// Lite TFlabSydney                      
+	// TFlTokyo									= #0CC1C0								// Lite TFlabTokyo                       
+	// TFlShanghai								= #ea1616								// Lite TFlabShanghai                    
+	// TFlEuro									= #BBE8B5								// Lite TFlabEuro                        
+	// TFlLondon								= #ACBBE8								// Lite TFlabLondon                      
+	// TFlNewyork								= #C5ACE8								// Lite TFlabNewyork                     
+	// TFlNYSE									= #87c2d4								// Lite TFlabNYSE                        
+
+/// ─── Ultr ───
+	// UltrBlueSky10							= #59F2E9								// UltrBlueSky10
+	// UltrBlueSky20							= #39F0EA								// UltrBlueSky20
+	// UltrMenta10								= #E0F9EF								// UltrMenta10
+	// UltrMenta20								= #80F3EC								// UtlrMenta20
+	// UltrMenta30								= #7FFFD4								// UltrMenta30
+	// UltrMenta40								= #73FFCA								// UltrMenta40
+	// UltrMenta50								= #9CFFD7								// UtlrMenta50
+	// UltrMenta60								= #4fffc0								// UtlrMenta60
+	// UltrRose20								= #FFA3E3								// UltrRose
+	// UltrFucsia30								= #ff6fd3								// UltrFucsia
+	// UltrLyla									= #7E57C2								// UltrLyla
+	// UltrLightGray							= #787B86								// UltrLightGray
+	// UltrRedNit								= #de0011								// UltrRedNit
+	// UltrRed									= #db004b								// UltrRed
+	// UltrBlue									= #003bde								// UltrBlue
+	// UltrYellow								= #f4de1a								// UltrYellow
+	// UltrSkyBlue								= #12cef8								// UltrSkyBlue
+	// UltrOrange								= #ff5a00								// UltrOrange
+
+/// ─── Allen ───
+AllenSky10								= #CCF8FF								// AllenSky10
+	// AllenSky20								= #80F3EC								// AllenSky20
+	// AllenSky50								= #01ebf9								// AllenSky50
+
+	// AllenMint10								= #E0F9EF								// AllenMint10
+	// AllenMint20								= #9CFFD7								// AllenMint20
+	// AllenMint30								= #7FFFD4								// AllenMint30
+	// AllenMint40								= #73FFCA								// AllenMint40
+	// AllenMint50								= #4fffc0								// AllenMint50
+AllenMint60								= #33FFAC								// AllenMint60
+
+	// AllenWine50								= #E91E63								// AllenWine50
+
+//// ─────────────────────────────────────────────────────────────────────
+
+//// ───────────────────────
+/// ─── Neon ────────
+/// ─── Variables ───
+//// ───────────────────────
+
+var crOvNeGrpNeon			= "─── CrossOver Neon ───"
+crOvNeVarLinesVisual		= input.bool(defval = true,				title = "Cross Neon",	group = crOvNeGrpNeon)
+
+crOvNeVarLinesMd			= input.bool(defval = true,				title = " Trend",		group = crOvNeGrpNeon)
+
+crOvNeVarLinesSm			= input.bool(defval = true,				title = "  MA 8",		group = crOvNeGrpNeon)
+crOvNeVarLinesBase			= input.bool(defval = true,				title = " MA 20",		group = crOvNeGrpNeon)
+crOvNeVarLinesLg			= input.bool(defval = true,				title = " MA 55",		group = crOvNeGrpNeon)
+crOvNeVarLinesXL			= input.bool(defval = true,				title = "MA 200",		group = crOvNeGrpNeon)
+
+color crOvNeVColorLong		= input.color(AllenMint60,				title = "Compra",		group = crOvNeGrpNeon,			inline = "NeonColor")
+color crOvNeVColorShort		= input.color(AllenSky10,				title = " Venta",		group = crOvNeGrpNeon,			inline = "NeonColor")
+crOvNeVColorBackGround		= ARoPrimary
+
+/// ─── Transparencias ───
+crOvNeVarTranspMd			= 50
+crOvNeVarTranspLg			= 60
+crOvNeVarTranspXl			= 70
+crOvNeVarTransp2Xl			= 80
+crOvNeVarTransp3Xl			= 85
+crOvNeVarTransp4Xl			= 90
+crOvNeVarTransp5Xl			= 95
+crOvNeVarTranspMax			= 100
+
+/// ─── Longitud ───
+crOvNeVarLengthXs			= 8
+crOvNeVarLengthSm			= 14
+crOvNeVarLengthBase			= 20
+crOvNeVarLengthLg			= 55
+crOvNeVarLengthXL			= 200
+
+//// ───────────────────────
+/// ─── Neon ────────
+/// ─── Opciones ─────
+//// ───────────────────────
+
+string crOvNeOptionMa	= input.string("EMA", "Tipo de MM", options = ["EMA", "SMA", "RMA", "WMA", "VWMA"])
+
+//// ───────────────────────
+/// ─── Neon ────────
+/// ─── Types ───────
+//// ───────────────────────
+
+type crOvNeTypeOHL
+	float O = open
+	float H = high
+	float L = low
+	float C = close
+	float V = volume
+	int   I = bar_index
+//// ───────────────────────
+/// ─── Neon ────────
+/// ─── Funciones ───
+//// ───────────────────────
+
+ma(source, length, type) =>
+	  type == "SMA" ? ta.sma(source, length) :		// Media Movil Simple
+	  type == "EMA" ? ta.ema(source, length) :		// Media Movil Exponencial
+	  type == "RMA" ? ta.rma(source, length) :		// Media Movil
+	  type == "WMA" ? ta.wma(source, length) :		// Media Movil Ponderada
+	  type == "VWMA" ? ta.vwma(source, length) :	// Media Movil Ponderada por volumen
+	  na
+
+//// ───────────────────────
+/// ─── Neon ────────
+/// ─── Instancias ──
+//// ───────────────────────
+crOvNeInsohl = crOvNeTypeOHL.new()
+
+//// ───────────────────────
+/// ─── Neon ────────
+/// ─── Math ────────
+//// ───────────────────────
+
+float crOvNeFumaXs			= ma(crOvNeInsohl.C,		crOvNeVarLengthXs,		crOvNeOptionMa)
+float crOvNeFumaSm			= ma(crOvNeInsohl.C,		crOvNeVarLengthSm,		crOvNeOptionMa)
+float crOvNeFumaBase		= ma(crOvNeInsohl.C,		crOvNeVarLengthBase,	crOvNeOptionMa)
+float crOvNeFumaLg			= ma(crOvNeInsohl.C,		crOvNeVarLengthLg,		crOvNeOptionMa)
+float crOvNeFumaXL			= ma(crOvNeInsohl.C,		crOvNeVarLengthXL,		crOvNeOptionMa)
+
+float crOvNeFumaHeight		= ta.percentrank(crOvNeFumaSm, 100)
+float crOvNeFutransparency	= math.min(80, 100 - crOvNeFumaHeight)
+
+bool crOvNeFumaRising 		= ta.rising(crOvNeFumaSm, 1)
+color crOvNeColorlineCross	= crOvNeFumaRising ? color.new(crOvNeVColorLong, crOvNeVarTranspMax-50) : color.new(crOvNeVColorShort, crOvNeVarTranspMax-50)
+
+bool crOvNeFuSignal			= crOvNeFumaXs > crOvNeFumaSm
+color crOvNeColorCrOver		= crOvNeFuSignal ? crOvNeVColorLong : crOvNeVColorShort
+
+// ─── CrossOver ───
+bool crOvNeFuCrossOver		= ta.crossover(crOvNeFumaXs, crOvNeFumaSm)
+bool crOvNeFuCrossOverMd	= ta.crossover(crOvNeFumaSm, crOvNeFumaBase)
+bool crOvNeFuCrossUnder		= ta.crossunder(crOvNeFumaXs, crOvNeFumaSm)
+bool crOvNeFuCrossUnderMd	= ta.crossunder(crOvNeFumaSm, crOvNeFumaBase)
+
+//// ───────────────────────
+/// ─── Neon ────────
+/// ─── EMAS Visual ─
+//// ───────────────────────
+
+/// ─── Ma 8 ───
+crOvNemaPlotSm	= plot(crOvNeVarLinesVisual and crOvNeVarLinesSm ? crOvNeFumaXs : na,		color = color.new(crOvNeColorCrOver, 65),							linewidth = 2,			editable = false)
+plot(crOvNeVarLinesVisual and crOvNeVarLinesSm ? crOvNeFumaXs : na,							color = color.new(crOvNeColorCrOver, crOvNeVarTransp3Xl),			linewidth = 8,			editable = false)
+plot(crOvNeVarLinesVisual and crOvNeVarLinesSm ? crOvNeFumaXs : na,							color = color.new(crOvNeColorCrOver, crOvNeVarTransp4Xl),			linewidth = 16,			editable = false)
+
+/// ─── Ma 20 ───
+crOvNemaPlotMd	= plot(crOvNeVarLinesVisual and crOvNeVarLinesBase ? crOvNeFumaBase : na,	color = color.new(crOvNeColorCrOver, 45),							linewidth = 2,			editable = false)
+plot(crOvNeVarLinesVisual and crOvNeVarLinesMd ? crOvNeFumaBase : na, 						color = crOvNeColorlineCross,										linewidth = 4,			editable = false)
+plot(crOvNeVarLinesVisual and crOvNeVarLinesBase ? crOvNeFumaBase : na,						color = color.new(crOvNeColorCrOver, crOvNeVarTransp3Xl),			linewidth = 8,			editable = false)
+plot(crOvNeVarLinesVisual and crOvNeVarLinesBase ? crOvNeFumaBase : na,						color = color.new(crOvNeColorCrOver, crOvNeVarTransp4Xl),			linewidth = 16,			editable = false)
+plot(crOvNeVarLinesVisual and crOvNeVarLinesBase ? crOvNeFumaBase : na,						color = color.new(crOvNeColorCrOver, crOvNeVarTransp5Xl),			linewidth = 32,			editable = false)
+
+/// ─── Ma 55 ───
+crOvNemaPlotXl	= plot(crOvNeVarLinesVisual and crOvNeVarLinesLg ? crOvNeFumaLg : na,		color = color.new(crOvNeColorCrOver, crOvNeVarTransp3Xl),			linewidth = 2,			editable = false)
+plot(crOvNeVarLinesVisual and crOvNeVarLinesLg ? crOvNeFumaLg : na,							color = color.new(crOvNeColorCrOver, crOvNeVarTransp4Xl),			linewidth = 8,			editable = false)
+plot(crOvNeVarLinesVisual and crOvNeVarLinesLg ? crOvNeFumaLg : na,							color = color.new(crOvNeColorCrOver, crOvNeVarTransp5Xl),			linewidth = 16,			editable = false)
+
+/// ─── Ma 200 ───
+crOvNemaPlot200 = plot(crOvNeVarLinesVisual and crOvNeVarLinesXL ? crOvNeFumaXL : na,		color = color.new(crOvNeVColorBackGround, 87),						linewidth = 3,			title = '',	style = plot.style_area)
+
+//// ───────────────────────
+/// ─── Neon ────────
+/// ─── Fills ───────
+//// ───────────────────────
+fill(crOvNemaPlotSm,		crOvNemaPlotMd,						color = color.new(crOvNeColorCrOver,80),			title = '')
+fill(crOvNemaPlotMd,		crOvNemaPlotXl,						color = color.new(crOvNeColorCrOver,95),			title = '')
+
+//// ───────────────────────
+/// ─── Neon ────────
+/// ─── Shape ───────
+//// ───────────────────────
+
+bgcolor(crOvNeVarLinesVisual and crOvNeFuCrossOver ? color.new(crOvNeVColorLong, 92) : crOvNeVarLinesVisual and crOvNeFuCrossUnder ? color.new(crOvNeVColorShort, 92) : na, show_last = 300, title = 'Crossover 14')
+bgcolor(crOvNeVarLinesVisual and crOvNeFuCrossOverMd ? color.new(crOvNeVColorLong, 80) : crOvNeVarLinesVisual and crOvNeFuCrossUnderMd ? color.new(crOvNeVColorShort, 80) : na, show_last = 300, title = 'Crossover 20')
