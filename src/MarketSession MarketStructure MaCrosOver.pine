@@ -1,6 +1,5 @@
 /// ╔═══════════════════════════════╗
 /// ║ 	CrossOver Neon				║
-/// ║ 	@	Allen.					║
 /// ╔═══════════════════════════════╗
 /// ║ 	Fx Market Sessions			║
 /// ╔═══════════════════════════════╗
@@ -294,14 +293,6 @@ vFxMkSs_SessTkTimeZ					= input.session	('1800-0300',			title = 'Periodo',						
 vFxMkSs_SessTkExtend				= input.string	(vFxMkSs_No,			title = 'Extender',											group = fxMrkSsGroupTyo,
 		  options					= [vFxMkSs_No, vFxMkSs_Extend])
 
-// /// Killzones Tokyo
-// showFxMkSs_KillTykOpen				= input.bool	(true,					title = 'KillZone Open',									group = fxMrkSsGroupTyo,			inline = 'KillTyoOpen')
-// vFxMkSs_KillTykTimeOpen				= input.session	('1845-2000',			title = ' ',												group = fxMrkSsGroupTyo,			inline = 'KillTyoOpen')
-// showFxMkSs_KillTykRally				= input.bool	(true,					title = 'KillZone Rally',									group = fxMrkSsGroupTyo,			inline = 'KillTyoRally')
-// vFxMkSs_KillTykTimeRally			= input.session	('2030-2230',			title = ' ',												group = fxMrkSsGroupTyo,			inline = 'KillTyoRally')
-// showFxMkSs_KillTykClose				= input.bool	(true,					title = 'KillZone Close',									group = fxMrkSsGroupTyo,			inline = 'KillTyoClose')
-// vFxMkSs_KillTykTimeClose			= input.session	('0015-0145',			title = ' ',												group = fxMrkSsGroupTyo,			inline = 'KillTyoClose')
-
 /// ─── Sydney
 showFxMkSs_SessSyd					= input.bool	(false,					title = 'Sydney  ',											group = fxMrkSsGroupSyd,			inline = 'session4_1') and vFxMkSs_Show
 vFxMkSs_SessSdLabel					= input.string	('Sydney',				title = ' ',												group = fxMrkSsGroupSyd,			inline = 'session4_1')
@@ -588,10 +579,6 @@ timeMkSs_KillNwYClose				= math.sign(nz(time(timeframe.period,	vFxMkSs_KillNwYTi
 /// ─── Timeframe Tokyo
 int timeMkSs_SessTyk				= time(timeframe.period, vFxMkSs_SessTkTimeZ, timeZo)
 
-// timeMkSs_KillTykOpen				= math.sign(nz(time(timeframe.period,	vFxMkSs_KillTykTimeOpen,	switchFxMksSession)))
-// timeMkSs_KillTykRally				= math.sign(nz(time(timeframe.period,	vFxMkSs_KillTykTimeRally,	switchFxMksSession)))
-// timeMkSs_KillTykClose				= math.sign(nz(time(timeframe.period,	vFxMkSs_KillTykTimeClose,	switchFxMksSession)))
-
 /// ─── Timeframe Sydney
 int timeMkSs_SessSyd				= time(timeframe.period, vFxMkSs_SessSdTimeZ, timeZo)
 
@@ -624,14 +611,6 @@ if showFxMkSs_KillNwYRally
 	[DwMkSs_KillNwY_Rally, DwMkSs_KillNwY_Rl]			= FuncFxMkSs_RenderKillZones(timeMkSs_KillNwYRally,	vFxMkSs_KillNwYColor)
 if showFxMkSs_KillNwYClose
 	[DwMkSs_KillNwY_Close, DwMkSs_KillNwY_Cl]			= FuncFxMkSs_RenderKillZones(timeMkSs_KillNwYClose,	vFxMkSs_KillNwYColor)
-
-// /// ─── KillZones Tokyo
-// if showFxMkSs_KillTykOpen
-// 	[DwMkSs_KillTyk_Open, DwMkSs_KillTyk_Op]			= FuncFxMkSs_RenderKillZones(timeMkSs_KillTykOpen,	vFxMkSs_KillTykColor)
-// if showFxMkSs_KillTykRally
-// 	[DwMkSs_KillTyk_Rally, DwMkSs_KillTyk_Rl]			= FuncFxMkSs_RenderKillZones(timeMkSs_KillTykRally,	vFxMkSs_KillTykColor)
-// if showFxMkSs_KillTykClose
-// 	[DwMkSs_KillTyk_Close, DwMkSs_KillTyk_Cl]			= FuncFxMkSs_RenderKillZones(timeMkSs_KillTykClose,	vFxMkSs_KillTykColor)
 
 //// ─────────────────────────────────────────────────────────────────────
 //// ─────────────────────────────────────────────────────────────────────
@@ -1011,8 +990,7 @@ if msOsCycleSig and ta.change(math.sign(msOSC - 15)) and ta.change(math.sign(cyc
 if msOsCycleSig and ta.change(math.sign(msOSC - 85)) and ta.change(math.sign(cycleFast - 50)) < 0 
 	label.new(bar.index, bar.high, '◒',		color = color(na),		textcolor = msOscilOSCColorSell,	size = size.normal,		style = label.style_label_up,	force_overlay = true)
 
-fill				(msPlot, midLine, 100, cycleOpt ? 60 : 50, top_color = color.new(msBullColor,   0), bottom_color = color.new(msBullColor, 100), title = "Bullish Gradient Fill")
-fill				(msPlot, midLine,  cycleOpt ? 40 : 50,  0, top_color = color.new(msBearColor, 100), bottom_color = color.new(msBearColor,   0), title = "Bearish Gradient Fill")
+fill		(msPlot, midLine, 100, cycleOpt ? 60 : 50, top_color = color.new(msBullColor,   0), bottom_color = color.new(msBullColor, 100), title = "Bullish Gradient Fill")
+fill		(msPlot, midLine,  cycleOpt ? 40 : 50,  0, top_color = color.new(msBearColor, 100), bottom_color = color.new(msBearColor,   0), title = "Bearish Gradient Fill")
 
 //// ─────────────────────────────────────────────────────────────────────
-
