@@ -5,11 +5,9 @@
 *Repositorio* — (https://github.com/munlit/FxMarketSessions-MarketStructureOsc-MaCrossOver-TSIDiverg-RsiSupertrend.git)
 
 -  Indicadores Integrados:
-   -  MA Crossover
-   -  Rsi SuperTrend
-   -  Tsi Divergences
-   -  Market Structure Oscillator
-   -  Fx Market Session
+
+      -  MarketSession MarketStructure MaCrosOver
+      -  TsiDiverg RsiSupertrend
   
 <img align="right" src="https://github.com/2LV/Tradingview-Indicators/assets/70970973/74846972-8cdd-491e-9d35-272fe0a8167d" alt="Pinescript Logo" width="200" height="130.31" />
 
@@ -24,10 +22,11 @@
 
 #### Secciones
 
--  Super Order Block
--  Session
--  Fvg
--  Neon CrossOver
+-  MA Crossover
+-  Rsi SuperTrend
+-  Tsi Divergences
+-  Market Structure Oscillator
+-  Fx Market Session
 
 #### Contribuciones 
 
