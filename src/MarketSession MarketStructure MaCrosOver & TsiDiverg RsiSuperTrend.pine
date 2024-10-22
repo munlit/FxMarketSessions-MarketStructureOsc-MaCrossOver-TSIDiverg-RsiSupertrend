@@ -911,14 +911,7 @@ if msOnChart3
 //// ───────────────────────
 
 /// ─── Lineal
-// oscTop				= plot(msOsc_Show or msDataK1 or msDataK2 or msDataK3 ? 100 : na,	'OSC Max',			color(na),						display = display.none,	editable = false)
-// upperBand			= plot(msOsc_Show or msDataK1 or msDataK2 or msDataK3 ? 85 : na,	'Sobrecompra',		color(na),						display = display.none,	editable = false)
 midLine				= plot(msOsc_Show or msDataK1 or msDataK2 or msDataK3 ? 50 : na,	'Equilibrio',		color.new(msOscilColorMid, 50),	display = display,		editable = false)
-// lowerBand			= plot(msOsc_Show or msDataK1 or msDataK2 or msDataK3 ? 15 : na,	'Sobreventa',		color(na),						display = display.none,	editable = false)
-// oscBtm				= plot(msOsc_Show or msDataK1 or msDataK2 or msDataK3 ? 0 : na,		'OSC Min',			color(na),						display = display.none,	editable = false)
-
-// fill				(oscTop, upperBand, 100, 85,	top_color = color.new(msBearColor, 100),	bottom_color = color.new(msBearColor, 65),		title = "Area de Sobrecompra")
-// fill				(lowerBand, oscBtm, 15, 0,		top_color = color.new(msBullColor, 65),		bottom_color = color.new(msBullColor, 100),		title = "Area de Sobreventa")
 
 [stValue1, stValue2, stValue3] = collectData()
 
@@ -1128,8 +1121,8 @@ sTrendRsiMovingAverage					= FusTrendCalculateMA(sTrendRsiValue, sTrendMovingAve
 //// ───────────────────────
 
 /// ─── Plot RSI / MA
-sTrendSupertrendPlot					= plot(sTrendRsiSupertrend,					color = FusTTrendDirection == -1 ? sTrendColorUp : sTrendColorDown,						title = "Supertrend")
-sTrendRsiPlot							= plot(sTrendRsiValue,						color = FusTTrendDirection == -1 ? sTrendColorUp : sTrendColorDown,		linewidth = 2,	title = "")
+sTrendSupertrendPlot					= plot(sTrendRsiSupertrend,					color = FusTTrendDirection == -1 ? sTrendColorUp : sTrendColorDown,							title = "Supertrend")
+sTrendRsiPlot							= plot(sTrendRsiValue,						color = FusTTrendDirection == -1 ? sTrendColorUp : sTrendColorDown,		linewidth = 1,		title = "")
 
 /// ─── Lines OverBought /OverSold
 plot(80,								color = color.from_gradient(sTrendRsiValue, 60, 80, color.new(sTrendColorBase, 73),		color.new(sTrendColorDown, 0)),					title = "",		linewidth = 6,	editable = false)
@@ -1143,7 +1136,7 @@ plot(20,								color = color.from_gradient(sTrendRsiValue, 20, 40, color.new(sT
 
 
 /// ─── Filling ───────
-fill(sTrendSupertrendPlot, sTrendRsiPlot,											color = FusTTrendDirection == 1 ? color.new(sTrendColorDown, 90) : color.new(sTrendColorUp, 90),	title = "Zona de Tendencia")
+fill(sTrendSupertrendPlot, sTrendRsiPlot,									color = FusTTrendDirection == 1 ? color.new(sTrendColorDown, 90) : color.new(sTrendColorUp, 90),	title = "Zona de Tendencia")
 fill(sTrendSupertrendPlot, sTrendRsiPlot, sTrendRsiValue, sTrendRsiSupertrend, color.new(chart.bg_color, 1000),		FusTTrendDirection == 1 ? sTrendColorDown : sTrendColorUp)
 
 // /// ─── Crossover & CrossUnder Signal
