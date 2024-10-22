@@ -173,23 +173,23 @@ bool crOvNeFuCrossUnderMd	= ta.crossunder(crOvNeFumaSm, crOvNeFumaBase)
 
 /// ─── Ma 8 ───
 crOvNemaPlotSm	= plot(crOvNeVarLinesVisual and crOvNeVarLinesSm ? crOvNeFumaXs : na,		color = color.new(crOvNeColorCrOver, 65),						linewidth = 2,		editable = false,		force_overlay = true)
-plot(crOvNeVarLinesVisual and crOvNeVarLinesSm ? crOvNeFumaXs : na,							color = color.new(crOvNeColorCrOver, crOvNeVarTransp3Xl),		linewidth = 8,		editable = false,		force_overlay = true)
-plot(crOvNeVarLinesVisual and crOvNeVarLinesSm ? crOvNeFumaXs : na,							color = color.new(crOvNeColorCrOver, crOvNeVarTransp4Xl),		linewidth = 16,		editable = false,		force_overlay = true)
+// plot(crOvNeVarLinesVisual and crOvNeVarLinesSm ? crOvNeFumaXs : na,							color = color.new(crOvNeColorCrOver, crOvNeVarTransp3Xl),		linewidth = 8,		editable = false,		force_overlay = true)
+// plot(crOvNeVarLinesVisual and crOvNeVarLinesSm ? crOvNeFumaXs : na,							color = color.new(crOvNeColorCrOver, crOvNeVarTransp4Xl),		linewidth = 16,		editable = false,		force_overlay = true)
 
 /// ─── Ma 20 ───
 crOvNemaPlotMd	= plot(crOvNeVarLinesVisual and crOvNeVarLinesBase ? crOvNeFumaBase : na,	color = color.new(crOvNeColorCrOver, 45),						linewidth = 2,		editable = false,		force_overlay = true)
-plot(crOvNeVarLinesVisual and crOvNeVarLinesMd ? crOvNeFumaBase : na, 						color = crOvNeColorlineCross,									linewidth = 4,		editable = false,		force_overlay = true)
+// plot(crOvNeVarLinesVisual and crOvNeVarLinesMd ? crOvNeFumaBase : na, 						color = crOvNeColorlineCross,									linewidth = 4,		editable = false,		force_overlay = true)
 plot(crOvNeVarLinesVisual and crOvNeVarLinesBase ? crOvNeFumaBase : na,						color = color.new(crOvNeColorCrOver, crOvNeVarTransp3Xl),		linewidth = 8,		editable = false,		force_overlay = true)
-plot(crOvNeVarLinesVisual and crOvNeVarLinesBase ? crOvNeFumaBase : na,						color = color.new(crOvNeColorCrOver, crOvNeVarTransp4Xl),		linewidth = 16,		editable = false,		force_overlay = true)
-plot(crOvNeVarLinesVisual and crOvNeVarLinesBase ? crOvNeFumaBase : na,						color = color.new(crOvNeColorCrOver, crOvNeVarTransp5Xl),		linewidth = 32,		editable = false,		force_overlay = true)
+// plot(crOvNeVarLinesVisual and crOvNeVarLinesBase ? crOvNeFumaBase : na,						color = color.new(crOvNeColorCrOver, crOvNeVarTransp4Xl),		linewidth = 16,		editable = false,		force_overlay = true)
+// plot(crOvNeVarLinesVisual and crOvNeVarLinesBase ? crOvNeFumaBase : na,						color = color.new(crOvNeColorCrOver, crOvNeVarTransp5Xl),		linewidth = 32,		editable = false,		force_overlay = true)
 
 /// ─── Ma 55 ───
 crOvNemaPlotXl	= plot(crOvNeVarLinesVisual and crOvNeVarLinesLg ? crOvNeFumaLg : na,		color = color.new(crOvNeColorCrOver, crOvNeVarTransp3Xl),		linewidth = 2,		editable = false,		force_overlay = true)
-plot(crOvNeVarLinesVisual and crOvNeVarLinesLg ? crOvNeFumaLg : na,							color = color.new(crOvNeColorCrOver, crOvNeVarTransp4Xl),		linewidth = 8,		editable = false,		force_overlay = true)
-plot(crOvNeVarLinesVisual and crOvNeVarLinesLg ? crOvNeFumaLg : na,							color = color.new(crOvNeColorCrOver, crOvNeVarTransp5Xl),		linewidth = 16,		editable = false,		force_overlay = true)
+// plot(crOvNeVarLinesVisual and crOvNeVarLinesLg ? crOvNeFumaLg : na,							color = color.new(crOvNeColorCrOver, crOvNeVarTransp4Xl),		linewidth = 8,		editable = false,		force_overlay = true)
+// plot(crOvNeVarLinesVisual and crOvNeVarLinesLg ? crOvNeFumaLg : na,							color = color.new(crOvNeColorCrOver, crOvNeVarTransp5Xl),		linewidth = 16,		editable = false,		force_overlay = true)
 
 /// ─── Ma 200 ───
-crOvNemaPlot200 = plot(crOvNeVarLinesVisual and crOvNeVarLinesXL ? crOvNeFumaXL : na,		color = color.new(crOvNeVColorBackGround, 87),					linewidth = 3,		title = '',		style = plot.style_area)
+crOvNemaPlot200 = plot(crOvNeVarLinesVisual and crOvNeVarLinesXL ? crOvNeFumaXL : na,		color = color.new(crOvNeVColorBackGround, 90),					linewidth = 3,		title = '',		style = plot.style_area,	force_overlay = true)
 
 //// ───────────────────────
 /// ─── Neon ────────
@@ -197,7 +197,7 @@ crOvNemaPlot200 = plot(crOvNeVarLinesVisual and crOvNeVarLinesXL ? crOvNeFumaXL 
 //// ───────────────────────
 
 fill(crOvNemaPlotSm,		crOvNemaPlotMd,						color = color.new(crOvNeColorCrOver,80),			title = '')
-fill(crOvNemaPlotMd,		crOvNemaPlotXl,						color = color.new(crOvNeColorCrOver,95),			title = '')
+// fill(crOvNemaPlotMd,		crOvNemaPlotXl,						color = color.new(crOvNeColorCrOver,95),			title = '')
 
 //// ─────────────────────────────────────────────────────────────────────
 //// ─────────────────────────────────────────────────────────────────────
@@ -911,14 +911,14 @@ if msOnChart3
 //// ───────────────────────
 
 /// ─── Lineal
-oscTop				= plot(msOsc_Show or msDataK1 or msDataK2 or msDataK3 ? 100 : na,	'OSC Max',			color(na),						display = display.none,	editable = false)
-upperBand			= plot(msOsc_Show or msDataK1 or msDataK2 or msDataK3 ? 85 : na,	'Sobrecompra',		color(na),						display = display.none,	editable = false)
+// oscTop				= plot(msOsc_Show or msDataK1 or msDataK2 or msDataK3 ? 100 : na,	'OSC Max',			color(na),						display = display.none,	editable = false)
+// upperBand			= plot(msOsc_Show or msDataK1 or msDataK2 or msDataK3 ? 85 : na,	'Sobrecompra',		color(na),						display = display.none,	editable = false)
 midLine				= plot(msOsc_Show or msDataK1 or msDataK2 or msDataK3 ? 50 : na,	'Equilibrio',		color.new(msOscilColorMid, 50),	display = display,		editable = false)
-lowerBand			= plot(msOsc_Show or msDataK1 or msDataK2 or msDataK3 ? 15 : na,	'Sobreventa',		color(na),						display = display.none,	editable = false)
-oscBtm				= plot(msOsc_Show or msDataK1 or msDataK2 or msDataK3 ? 0 : na,		'OSC Min',			color(na),						display = display.none,	editable = false)
+// lowerBand			= plot(msOsc_Show or msDataK1 or msDataK2 or msDataK3 ? 15 : na,	'Sobreventa',		color(na),						display = display.none,	editable = false)
+// oscBtm				= plot(msOsc_Show or msDataK1 or msDataK2 or msDataK3 ? 0 : na,		'OSC Min',			color(na),						display = display.none,	editable = false)
 
-fill				(oscTop, upperBand, 100, 85,	top_color = color.new(msBearColor, 100),	bottom_color = color.new(msBearColor, 65),		title = "Area de Sobrecompra")
-fill				(lowerBand, oscBtm, 15, 0,		top_color = color.new(msBullColor, 65),		bottom_color = color.new(msBullColor, 100),		title = "Area de Sobreventa")
+// fill				(oscTop, upperBand, 100, 85,	top_color = color.new(msBearColor, 100),	bottom_color = color.new(msBearColor, 65),		title = "Area de Sobrecompra")
+// fill				(lowerBand, oscBtm, 15, 0,		top_color = color.new(msBullColor, 65),		bottom_color = color.new(msBullColor, 100),		title = "Area de Sobreventa")
 
 [stValue1, stValue2, stValue3] = collectData()
 
@@ -1135,20 +1135,20 @@ sTrendRsiPlot							= plot(sTrendRsiValue,						color = FusTTrendDirection == -1
 plot(80,								color = color.from_gradient(sTrendRsiValue, 60, 80, color.new(sTrendColorBase, 73),		color.new(sTrendColorDown, 0)),					title = "",		linewidth = 6,	editable = false)
 plot(20,								color = color.from_gradient(sTrendRsiValue, 20, 40, color.new(sTrendColorUp, 0),		color.new(sTrendColorBase, 73)),				title = "",		linewidth = 6,	editable = false)
 
-plot(75,								color = color.from_gradient(sTrendRsiValue, 60, 75, color.new(sTrendColorBase, 73),		color.new(sTrendColorDown, 0)),					title = "",		linewidth = 8,	editable = false)
-plot(25,								color = color.from_gradient(sTrendRsiValue, 25, 40, color.new(sTrendColorUp, 0),		color.new(sTrendColorBase, 73)),				title = "",		linewidth = 8,	editable = false)
+// plot(75,								color = color.from_gradient(sTrendRsiValue, 60, 75, color.new(sTrendColorBase, 73),		color.new(sTrendColorDown, 0)),					title = "",		linewidth = 8,	editable = false)
+// plot(25,								color = color.from_gradient(sTrendRsiValue, 25, 40, color.new(sTrendColorUp, 0),		color.new(sTrendColorBase, 73)),				title = "",		linewidth = 8,	editable = false)
 
-plot(70,								color = color.from_gradient(sTrendRsiValue, 50, 70, color.new(sTrendColorBase, 73),		color.new(sTrendColorDown, 0)),					title = "",		linewidth = 6,	editable = false)
-plot(30,								color = color.from_gradient(sTrendRsiValue, 30, 50, color.new(sTrendColorUp, 0),		color.new(sTrendColorBase, 73)),				title = "",		linewidth = 6,	editable = false)
+// plot(70,								color = color.from_gradient(sTrendRsiValue, 50, 70, color.new(sTrendColorBase, 73),		color.new(sTrendColorDown, 0)),					title = "",		linewidth = 6,	editable = false)
+// plot(30,								color = color.from_gradient(sTrendRsiValue, 30, 50, color.new(sTrendColorUp, 0),		color.new(sTrendColorBase, 73)),				title = "",		linewidth = 6,	editable = false)
 
 
 /// ─── Filling ───────
 fill(sTrendSupertrendPlot, sTrendRsiPlot,											color = FusTTrendDirection == 1 ? color.new(sTrendColorDown, 90) : color.new(sTrendColorUp, 90),	title = "Zona de Tendencia")
 fill(sTrendSupertrendPlot, sTrendRsiPlot, sTrendRsiValue, sTrendRsiSupertrend, color.new(chart.bg_color, 1000),		FusTTrendDirection == 1 ? sTrendColorDown : sTrendColorUp)
 
-/// ─── Crossover & CrossUnder Signal
-plotshape(ta.crossover(sTrendRsiSupertrend, sTrendRsiValue)		and sTrendRsiSupertrend > 70 ? 85 : na,	style = shape.triangledown,	location = location.absolute,	color = sTrendColorDown,	size = size.tiny,	title = "▼")
-plotshape(ta.crossunder(sTrendRsiSupertrend, sTrendRsiValue)	and sTrendRsiSupertrend < 30 ? 15 : na,	style = shape.triangleup,	location = location.absolute,	color = sTrendColorUp,		size = size.tiny,	title = "▲")
+// /// ─── Crossover & CrossUnder Signal
+// plotshape(ta.crossover(sTrendRsiSupertrend, sTrendRsiValue)		and sTrendRsiSupertrend > 70 ? 85 : na,	style = shape.triangledown,	location = location.absolute,	color = sTrendColorDown,	size = size.tiny,	title = "▼")
+// plotshape(ta.crossunder(sTrendRsiSupertrend, sTrendRsiValue)	and sTrendRsiSupertrend < 30 ? 15 : na,	style = shape.triangleup,	location = location.absolute,	color = sTrendColorUp,		size = size.tiny,	title = "▲")
 
 //// ─────────────────────────────────────────────────────────────────────
 //// ─────────────────────────────────────────────────────────────────────
