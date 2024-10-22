@@ -1,0 +1,1308 @@
+/// ╔═══════════════════════════════╗
+/// ║ 	CrossOver Neon				║
+/// ╔═══════════════════════════════╗
+/// ║ 	Fx Market Sessions			║
+/// ╔═══════════════════════════════╗
+/// ║ 	Market Structure Oscilador	║
+/// ╚═══════════════════════════════╝
+
+/// ╔═══════════════════════════════╗
+/// ║  Tsi & Divergences			║
+/// ╔═══════════════════════════════╗
+/// ║ 	RSI Supertrend				║
+/// ║ 	@	Allen	㔬				║
+/// ╚═══════════════════════════════╝
+
+//@version=5
+indicator(title = 'FxMarketSessions & MarketStructureOscilador & MaCrossOver & TSIDiverg & RsiSupertrend [🎱 Allen 㔬]',
+		  shorttitle				= 'FxMSess MSOsc MaCross & TSIDiv Rsitrend [🎱Allen 㔬]',
+		  overlay					= true,
+		  max_boxes_count			= 500,
+		  max_labels_count			= 500,
+		  max_lines_count			= 500,
+		  max_bars_back				= 1000,
+		  format					= format.price,
+		  precision					= 4)
+		//   timeframe					= "")
+
+//// ─────────────────────────────────────────────────────────────────────
+
+AmeTrGrayNickel							= #F1F1F1
+AmeTrBlueFrost							= #E1EEF9
+ARoPrimary								= #0035FF
+BrLiYel10								= #FBFD73
+BrLiYel30								= #FDF43C
+BrLiYel40								= #FEF301
+WavBehPink20							= #FFB7FF
+WavBehFucsia50							= #DF36DF
+WavBehAqua50							= #0CF2F2
+VictSecPink50							= #E651CD
+VictSecFucsia50							= #EA1889
+MongoSky10								= #E3FCF7
+SurfePrimary							= #073742
+SurfePink500							= #FC84E1
+CitiAccentLightBlue						= #CCEEFF
+PlatziGreen30							= #ADEB42
+PlatziGreen40							= #85C638
+PlatziBlue70							= #121F3D
+PlatziBlue50							= #24385B
+AllenSky10								= #CCF8FF
+AllenSky20								= #80F3EC
+AllenMint10								= #E0F9EF
+AllenMint20								= #9CFFD7
+AllenMint50								= #4FFFC0
+AllenMint60								= #33FFAC
+AllenWine60								= #E8114B
+AllenFucsia50							= #EA1889
+
+//// ─────────────────────────────────────────────────────────────────────
+
+/// ╔═══════════════════════════════╗
+/// ║ 	CrossOver Neon				║
+/// ║ 	@	Ultr.					║
+/// ╚═══════════════════════════════╝
+
+//// ─────────────────────────────────────────────────────────────────────
+
+//// ───────────────────────
+/// ─── Neon ────────
+/// ─── Variables ───
+//// ───────────────────────
+
+var crOvNeGrpNeon			= "─── CrossOver Neon ───"
+crOvNeVarLinesVisual		= input.bool(defval = true,				title = "Cross Neon",	group = crOvNeGrpNeon)
+
+crOvNeVarLinesMd			= input.bool(defval = true,				title = " Trend",		group = crOvNeGrpNeon)
+
+crOvNeVarLinesSm			= input.bool(defval = true,				title = "  MA 8",		group = crOvNeGrpNeon)
+crOvNeVarLinesBase			= input.bool(defval = true,				title = " MA 20",		group = crOvNeGrpNeon)
+crOvNeVarLinesLg			= input.bool(defval = true,				title = " MA 55",		group = crOvNeGrpNeon)
+crOvNeVarLinesXL			= input.bool(defval = true,				title = "MA 200",		group = crOvNeGrpNeon)
+
+color crOvNeVColorLong		= input.color(AllenMint60,				title = "Compra",		group = crOvNeGrpNeon,			inline = "NeonColor")
+color crOvNeVColorShort		= input.color(BrLiYel10,				title = " Venta",		group = crOvNeGrpNeon,			inline = "NeonColor")
+crOvNeVColorBackGround		= ARoPrimary
+
+/// ─── Transparencias ───
+crOvNeVarTranspMd			= 50
+crOvNeVarTranspLg			= 60
+crOvNeVarTranspXl			= 70
+crOvNeVarTransp2Xl			= 80
+crOvNeVarTransp3Xl			= 85
+crOvNeVarTransp4Xl			= 90
+crOvNeVarTransp5Xl			= 95
+crOvNeVarTranspMax			= 100
+
+/// ─── Longitud ───
+crOvNeVarLengthXs			= 8
+crOvNeVarLengthSm			= 14
+crOvNeVarLengthBase			= 20
+crOvNeVarLengthLg			= 55
+crOvNeVarLengthXL			= 200
+
+//// ───────────────────────
+/// ─── Neon ────────
+/// ─── Opciones ─────
+//// ───────────────────────
+
+string crOvNeOptionMa	= input.string("EMA", "Tipo de MM", options = ["EMA", "SMA", "RMA", "WMA", "VWMA"])
+
+//// ───────────────────────
+/// ─── Neon ────────
+/// ─── Types ───────
+//// ───────────────────────
+
+type crOvNeTypeOHL
+	float O = open
+	float H = high
+	float L = low
+	float C = close
+	float V = volume
+	int   I = bar_index
+
+//// ───────────────────────
+/// ─── Neon ────────
+/// ─── Funciones ───
+//// ───────────────────────
+
+ma(source, length, type) =>
+	  type == "SMA" ? ta.sma(source, length) :		// Media Movil Simple
+	  type == "EMA" ? ta.ema(source, length) :		// Media Movil Exponencial
+	  type == "RMA" ? ta.rma(source, length) :		// Media Movil
+	  type == "WMA" ? ta.wma(source, length) :		// Media Movil Ponderada
+	  type == "VWMA" ? ta.vwma(source, length) :	// Media Movil Ponderada por volumen
+	  na
+
+//// ───────────────────────
+/// ─── Neon ────────
+/// ─── Instancias ──
+//// ───────────────────────
+
+crOvNeInsohl = crOvNeTypeOHL.new()
+
+//// ───────────────────────
+/// ─── Neon ────────
+/// ─── Math ────────
+//// ───────────────────────
+
+float crOvNeFumaXs			= ma(crOvNeInsohl.C,		crOvNeVarLengthXs,		crOvNeOptionMa)
+float crOvNeFumaSm			= ma(crOvNeInsohl.C,		crOvNeVarLengthSm,		crOvNeOptionMa)
+float crOvNeFumaBase		= ma(crOvNeInsohl.C,		crOvNeVarLengthBase,	crOvNeOptionMa)
+float crOvNeFumaLg			= ma(crOvNeInsohl.C,		crOvNeVarLengthLg,		crOvNeOptionMa)
+float crOvNeFumaXL			= ma(crOvNeInsohl.C,		crOvNeVarLengthXL,		crOvNeOptionMa)
+
+float crOvNeFumaHeight		= ta.percentrank(crOvNeFumaSm, 100)
+float crOvNeFutransparency	= math.min(80, 100 - crOvNeFumaHeight)
+
+bool crOvNeFumaRising 		= ta.rising(crOvNeFumaSm, 1)
+color crOvNeColorlineCross	= crOvNeFumaRising ? color.new(crOvNeVColorLong, crOvNeVarTranspMax-50) : color.new(crOvNeVColorShort, crOvNeVarTranspMax-50)
+
+bool crOvNeFuSignal			= crOvNeFumaXs > crOvNeFumaSm
+color crOvNeColorCrOver		= crOvNeFuSignal ? crOvNeVColorLong : crOvNeVColorShort
+
+// ─── CrossOver ───
+bool crOvNeFuCrossOver		= ta.crossover(crOvNeFumaXs, crOvNeFumaSm)
+bool crOvNeFuCrossOverMd	= ta.crossover(crOvNeFumaSm, crOvNeFumaBase)
+bool crOvNeFuCrossUnder		= ta.crossunder(crOvNeFumaXs, crOvNeFumaSm)
+bool crOvNeFuCrossUnderMd	= ta.crossunder(crOvNeFumaSm, crOvNeFumaBase)
+
+//// ───────────────────────
+/// ─── Neon ────────
+/// ─── EMAS Visual ─
+//// ───────────────────────
+
+/// ─── Ma 8 ───
+crOvNemaPlotSm	= plot(crOvNeVarLinesVisual and crOvNeVarLinesSm ? crOvNeFumaXs : na,		color = color.new(crOvNeColorCrOver, 65),						linewidth = 2,		editable = false,		force_overlay = true)
+plot(crOvNeVarLinesVisual and crOvNeVarLinesSm ? crOvNeFumaXs : na,							color = color.new(crOvNeColorCrOver, crOvNeVarTransp3Xl),		linewidth = 8,		editable = false,		force_overlay = true)
+plot(crOvNeVarLinesVisual and crOvNeVarLinesSm ? crOvNeFumaXs : na,							color = color.new(crOvNeColorCrOver, crOvNeVarTransp4Xl),		linewidth = 16,		editable = false,		force_overlay = true)
+
+/// ─── Ma 20 ───
+crOvNemaPlotMd	= plot(crOvNeVarLinesVisual and crOvNeVarLinesBase ? crOvNeFumaBase : na,	color = color.new(crOvNeColorCrOver, 45),						linewidth = 2,		editable = false,		force_overlay = true)
+plot(crOvNeVarLinesVisual and crOvNeVarLinesMd ? crOvNeFumaBase : na, 						color = crOvNeColorlineCross,									linewidth = 4,		editable = false,		force_overlay = true)
+plot(crOvNeVarLinesVisual and crOvNeVarLinesBase ? crOvNeFumaBase : na,						color = color.new(crOvNeColorCrOver, crOvNeVarTransp3Xl),		linewidth = 8,		editable = false,		force_overlay = true)
+plot(crOvNeVarLinesVisual and crOvNeVarLinesBase ? crOvNeFumaBase : na,						color = color.new(crOvNeColorCrOver, crOvNeVarTransp4Xl),		linewidth = 16,		editable = false,		force_overlay = true)
+plot(crOvNeVarLinesVisual and crOvNeVarLinesBase ? crOvNeFumaBase : na,						color = color.new(crOvNeColorCrOver, crOvNeVarTransp5Xl),		linewidth = 32,		editable = false,		force_overlay = true)
+
+/// ─── Ma 55 ───
+crOvNemaPlotXl	= plot(crOvNeVarLinesVisual and crOvNeVarLinesLg ? crOvNeFumaLg : na,		color = color.new(crOvNeColorCrOver, crOvNeVarTransp3Xl),		linewidth = 2,		editable = false,		force_overlay = true)
+plot(crOvNeVarLinesVisual and crOvNeVarLinesLg ? crOvNeFumaLg : na,							color = color.new(crOvNeColorCrOver, crOvNeVarTransp4Xl),		linewidth = 8,		editable = false,		force_overlay = true)
+plot(crOvNeVarLinesVisual and crOvNeVarLinesLg ? crOvNeFumaLg : na,							color = color.new(crOvNeColorCrOver, crOvNeVarTransp5Xl),		linewidth = 16,		editable = false,		force_overlay = true)
+
+/// ─── Ma 200 ───
+crOvNemaPlot200 = plot(crOvNeVarLinesVisual and crOvNeVarLinesXL ? crOvNeFumaXL : na,		color = color.new(crOvNeVColorBackGround, 87),					linewidth = 3,		title = '',		style = plot.style_area)
+
+//// ───────────────────────
+/// ─── Neon ────────
+/// ─── Fills ───────
+//// ───────────────────────
+
+fill(crOvNemaPlotSm,		crOvNemaPlotMd,						color = color.new(crOvNeColorCrOver,80),			title = '')
+fill(crOvNemaPlotMd,		crOvNemaPlotXl,						color = color.new(crOvNeColorCrOver,95),			title = '')
+
+//// ─────────────────────────────────────────────────────────────────────
+//// ─────────────────────────────────────────────────────────────────────
+//// ─────────────────────────────────────────────────────────────────────
+
+/// ╔═══════════════════════════════╗
+/// ║ 	Fx Market Sessions			║
+/// ╚═══════════════════════════════╝
+
+//// ─────────────────────────────────────────────────────────────────────
+
+//// ───────────────────────
+/// ─── FxMSs ───
+/// ─── Cont ───
+//// ───────────────────────
+
+fxMrkSsGroupGral					= 'General'
+fxMrkSsGroupSyd						= 'Sesión Sydney'
+fxMrkSsGroupTyo						= 'Sesión Tokyo'
+fxMrkSsGroupLon						= 'Sesión Londres'
+fxMrkSsGroupNewY					= 'Sesión New York'
+fxMrkSsGroupBox						= 'Box'
+fxMrkSsGroupTag						= 'Etiquetas'
+fxMrkSsGroupRng						= 'Rango Abierto'
+fxMrkSsGroupOsc						= 'Oscilador'
+fxMrkSsGroupFibo					= 'Niveles Fibonacci'
+fxMrkSsGroupOpc						= 'Opciones'
+fxMrkSsGroupBar						= 'Vela'
+fxMrkSsGroupAlrt					= 'Alertas Visuales'
+fxMrkSsGroupInf						= 'Información'
+fxMrkSsGroupLine					= 'Box'
+
+vFxMkSs_Show						= true
+vFxMkSs_Yes							= 'Si'
+vFxMkSs_No							= 'No'
+vFxMkSs_Extend						= 'Extendido'
+vfxMkSs_Hide						= 'Hide'
+tooltipFfxMkSs_TimeZ				= "Mas opciones de zonas horarias, por ej: \n 'GMT-10', 'GMT-9', 'GMT-8', 'GMT-7', 'GMT-6', \n 'GMT-5', 'GMT-4', 'GMT-3', 'GMT-2', 'GMT-1', \n 'GMT', 'GMT+1', 'GMT+2', 'GMT+3', 'GMT+4'"
+
+vFxMkSs_LondonColor					= WavBehAqua50
+vFxMkSs_NewYorkColor				= AllenMint60
+vFxMkSs_TokyoColor					= SurfePink500
+vFxMkSs_SydneyColor					= BrLiYel30
+
+vFxMkSs_KillLonColor				= vFxMkSs_LondonColor
+vFxMkSs_KillNwYColor				= vFxMkSs_NewYorkColor
+vFxMkSs_KillTykColor				= vFxMkSs_TokyoColor
+vFxMkSs_KillSidColor				= vFxMkSs_SydneyColor
+
+vFxMkSs_NoneColor					= color.new(SurfePrimary, 100)
+
+
+//// ───────────────────────
+/// ─── FxMSs ───
+/// ─── Inputs ───
+//// ───────────────────────
+
+/// ─── Timezone
+optFxMkSs_TimeZone					= input.string	(defval = 'NYSE',		title = 'Timezone',											group = fxMrkSsGroupGral,			tooltip = tooltipFfxMkSs_TimeZ ,
+// optFxMkSs_TimeZone					= input.string	(defval = 'New York',	title = 'Timezone',											group = fxMrkSsGroupGral,			tooltip = tooltipFfxMkSs_TimeZ ,
+		  options					= ["New York", "Chicago", "NYSE", "Londres", "Tokyo", "Sydney", "Argentina"])
+showFxMkSs_History					= input.string	(defval = vFxMkSs_Yes,	title = 'Historico',										group = fxMrkSsGroupGral,			options = [vFxMkSs_Yes, vFxMkSs_No]) == vFxMkSs_Yes
+vFxMkSs_Lookback					= 12 * 60
+
+/// ─── Sessions
+
+/// ─── London
+showFxMkSs_SessLon					= input.bool	(true,					title = 'Londres  ',										group = fxMrkSsGroupLon,			inline = 'session1_1') and vFxMkSs_Show
+vFxMkSs_SessLnLabel					= input.string	('Londres',				title = ' ',												group = fxMrkSsGroupLon,			inline = 'session1_1')
+vFxMkSs_SessLnColor					= input.color	(vFxMkSs_LondonColor,	title = ' ',												group = fxMrkSsGroupLon,			inline = 'session1_1')
+vFxMkSs_SessLnTimeZ					= input.session	('0200-1100',			title = 'Periodo',											group = fxMrkSsGroupLon)
+vFxMkSs_SessLnExtend				= input.string	(vFxMkSs_No,			title = 'Extender',											group = fxMrkSsGroupLon,
+		  options					= [vFxMkSs_No, vFxMkSs_Extend])
+
+/// Killzones London
+showFxMkSs_KillLonOpen				= input.bool	(true,					title = 'KillZone Open',									group = fxMrkSsGroupLon,			inline = 'KillLonOpen')
+vFxMkSs_KillLonTimeOpen				= input.session	('0300-0430',			title = ' ',												group = fxMrkSsGroupLon,			inline = 'KillLonOpen')
+showFxMkSs_KillLonRally				= input.bool	(true,					title = 'KillZone Rally',									group = fxMrkSsGroupLon,			inline = 'KillLonRally')
+vFxMkSs_KillLonTimeRally			= input.session	('0500-0630',			title = ' ',												group = fxMrkSsGroupLon,			inline = 'KillLonRally')
+showFxMkSs_KillLonClose				= input.bool	(true,					title = 'KillZone Close',									group = fxMrkSsGroupLon,			inline = 'KillLonClose')
+vFxMkSs_KillLonTimeClose			= input.session	('1000-1100',			title = ' ',												group = fxMrkSsGroupLon,			inline = 'KillLonClose')
+
+/// ─── New York
+showFxMkSs_SessNy					= input.bool	(true,					title = 'New York  ',										group = fxMrkSsGroupNewY,			inline = 'session2_1') and vFxMkSs_Show
+vFxMkSs_SessNyLabel					= input.string	('New York',			title = ' ',												group = fxMrkSsGroupNewY,			inline = 'session2_1')
+vFxMkSs_SessNyColor					= input.color	(vFxMkSs_NewYorkColor,	title = ' ',												group = fxMrkSsGroupNewY,			inline = 'session2_1')
+vFxMkSs_SessNyTimeZ					= input.session	('0700-1600',			title = 'Periodo',											group = fxMrkSsGroupNewY)
+vFxMkSs_SessNyExtend				= input.string	(vFxMkSs_No,			title = 'Extender',											group = fxMrkSsGroupNewY,
+		  options					= [vFxMkSs_No, vFxMkSs_Extend])
+
+/// Killzones New York
+showFxMkSs_KillNwYOpen				= input.bool	(true,					title = 'KillZone Open',									group = fxMrkSsGroupNewY,			inline = 'KillNwYOpen')
+vFxMkSs_KillNwYTimeOpen				= input.session	('0630-0745',			title = ' ',												group = fxMrkSsGroupNewY,			inline = 'KillNwYOpen')
+showFxMkSs_KillNwYRally				= input.bool	(true,					title = 'KillZone Rally',									group = fxMrkSsGroupNewY,			inline = 'KillNwYRally')
+vFxMkSs_KillNwYTimeRally			= input.session	('0900-1045',			title = ' ',												group = fxMrkSsGroupNewY,			inline = 'KillNwYRally')
+showFxMkSs_KillNwYClose				= input.bool	(true,					title = 'KillZone Close',									group = fxMrkSsGroupNewY,			inline = 'KillNwYClose')
+vFxMkSs_KillNwYTimeClose			= input.session	('1130-1215',			title = ' ',												group = fxMrkSsGroupNewY,			inline = 'KillNwYClose')
+
+/// ─── Tokyo
+showFxMkSs_SessTk					= input.bool	(true,					title = 'Tokyo   ',											group = fxMrkSsGroupTyo,			inline = 'session3_1') and vFxMkSs_Show
+vFxMkSs_SessTkLabel					= input.string	('Tokyo',				title = ' ',												group = fxMrkSsGroupTyo,			inline = 'session3_1')
+vFxMkSs_SessTkColor					= input.color	(vFxMkSs_TokyoColor,	title = ' ',												group = fxMrkSsGroupTyo,			inline = 'session3_1')
+vFxMkSs_SessTkTimeZ					= input.session	('1800-0300',			title = 'Periodo',											group = fxMrkSsGroupTyo)
+vFxMkSs_SessTkExtend				= input.string	(vFxMkSs_No,			title = 'Extender',											group = fxMrkSsGroupTyo,
+		  options					= [vFxMkSs_No, vFxMkSs_Extend])
+
+/// ─── Sydney
+showFxMkSs_SessSyd					= input.bool	(false,					title = 'Sydney  ',											group = fxMrkSsGroupSyd,			inline = 'session4_1') and vFxMkSs_Show
+vFxMkSs_SessSdLabel					= input.string	('Sydney',				title = ' ',												group = fxMrkSsGroupSyd,			inline = 'session4_1')
+vFxMkSs_SessSdColor					= input.color	(vFxMkSs_SydneyColor,	title = ' ',												group = fxMrkSsGroupSyd,			inline = 'session4_1')
+vFxMkSs_SessSdTimeZ					= input.session	('1600-0100',			title = 'Periodo',											group = fxMrkSsGroupSyd)
+vFxMkSs_SessSdExtend				= input.string	(vFxMkSs_No,			title = 'Extender',											group = fxMrkSsGroupSyd,
+		  options					= [vFxMkSs_No, vFxMkSs_Extend])
+
+/// ─── Show & Styles
+optFxMkSs_BorderStyle				= input.string	("···",					title = 'Box style', 										group = fxMrkSsGroupLine,
+		  options					= ["───", "---", "···"])
+vFxMkSs_BorderWidth					= input.int		(1,						title = 'Ancho de Linea',	minval = 0,						group = fxMrkSsGroupLine)
+vFxMkSs_BgOpacity					= input.int		(92,					title = 'Transp fondo',minval = 0,maxval = 100,step = 1,	group = fxMrkSsGroupLine,			tooltip = 'Setting the 100 is no background color')
+vFxMkSs_LineOpacity					= input.int		(40,					title = 'Transp contorno',minval = 0,maxval = 100,step = 1,	group = fxMrkSsGroupLine,			tooltip = 'Setting the 100 is no background color')
+
+/// ─── Labels
+showFxMkSs_Labels					= input.bool	(true,					title = 'Información',										group = fxMrkSsGroupTag,			inline = 'label_show') and vFxMkSs_Show
+optFxMkSs_LabelSize					= input.string	('Pequeño',				title = '',													group = fxMrkSsGroupTag,			inline = 'label_show',
+		  options					= ['Auto', 'Mini', 'Pequeño', 'Normal', 'Grande', 'Enorme'])
+optFxMkSs_LabelPositionY			= input.string	('Arriba',				title = '',													group = fxMrkSsGroupTag,			inline = 'label_loc',
+		  options					= ['Arriba', 'Abajo'])
+optFxMkSs_LabelPositionIn			= input.string	('Externo',				title = '',													group = fxMrkSsGroupTag,			inline = 'label_loc',
+		  options					= ['Interno', 'Externo'])
+
+/// ─── Info
+showFxMkSs_LabelName				= input.bool	(true,					title = 'Sesión',											group = fxMrkSsGroupTag,			inline = 'label_format')
+showFxMkSs_LabelDay					= input.bool	(true,					title = 'Dia',												group = fxMrkSsGroupTag,			inline = 'label_format')
+showFxMkSs_LabelPrice				= input.bool	(false,					title = 'Precio',											group = fxMrkSsGroupTag,			inline = 'label_format')
+showFxMkSs_LabelPips				= input.bool	(true,					title = 'Pips',												group = fxMrkSsGroupTag,			inline = 'label_format')
+
+vFxMkSsPips							= syminfo.mintick * 10
+vFxMkSs_MaxBars						= 500
+
+vFxMkSs_FmtPrice					= '{0,number,#.#####}'
+vFxMkSs_FmtPips						= '{0,number,#.#}'
+vFxMkSs_IconSeparator				= ' • '
+vFxMkSs_IsWeekends					= dayofweek == 7 or dayofweek == 1
+
+optFxMkSs_BorderKillzone			= line.style_solid
+
+//// ───────────────────────
+/// ─── FxMSs ───
+/// ─── Switch ───
+//// ───────────────────────
+
+string switchFxMksLines		= switch optFxMkSs_BorderStyle
+	"───"							=> line.style_solid
+	"---"							=> line.style_dashed
+	"···"							=> line.style_dotted
+
+string switchFxMksPosY		= switch optFxMkSs_LabelPositionY
+	"Arriba"						=> "top"
+	"Abajo"							=> "bottom"
+
+string switchFxMksIntra		= switch optFxMkSs_LabelPositionIn
+	"Externo"						=> "outside"
+	"Interno"						=> "inside"
+
+string switchFxMksSize		= switch optFxMkSs_LabelSize
+	"Auto"							=> size.auto
+	"Mini"							=> size.tiny
+	"Pequeño"						=> size.small
+	"Normal"						=> size.normal
+	"Grande"						=> size.large
+	"Enorme"						=> size.huge
+
+string switchFxMksSession	= switch optFxMkSs_TimeZone
+	"NYSE"							=> "UTC-5"
+	"New York"						=> "America/New_York"
+	"Chicago"						=> "America/Chicago"
+	"Londres"						=> "Europe/London"
+	"Tokyo"							=> "Asia/Tokyo"
+	"Shanghai"						=> "Asia/Shanghai"
+	"Sydney"						=> "Australia/Sydney"
+	"Argentina"						=> "America/Argentina/Buenos_Aires"
+
+//// ───────────────────────
+/// ─── FxMSs ───
+/// ─── Functions ───
+//// ───────────────────────
+
+FuncFxMkSs_GetDay(n) =>
+	switch n
+		1							=> 'Domingo'
+		2							=> 'Lunes'
+		3							=> 'Martes'
+		4							=> 'Miercoles'
+		5							=> 'Jueves'
+		6							=> 'Viernes'
+		7							=> 'Sabado'
+
+FuncFxMkSs_GetPeriod(_session, _start, _lookback) =>
+	result							= math.max(_start, 1)
+	for i 							= result to _lookback
+		if na(_session[i+1])		and _session[i]
+			result					:= i+1
+			break
+	result
+
+FuncFxMkSs_GetStarted(_session) => na(_session[1]) and _session
+
+FuncFxMkSs_GetEnded(_session) => na(_session) and _session[1]
+
+FuncFxMkSs_GetLabelPosition(_y, _side) =>
+	switch _y
+		'top'						=> _side == 'outside' ? label.style_label_lower_left : label.style_label_upper_left
+		'bottom'					=> _side == 'outside' ? label.style_label_upper_left : label.style_label_lower_left
+
+vFxMkSs_LabelPosition				= FuncFxMkSs_GetLabelPosition(switchFxMksPosY, switchFxMksIntra)
+
+/// ─── Labels
+FuncFxMkSs_RenderLabel(_show, _session, _is_started, _color, _top, _bottom, _text, _delete_history) =>
+	var label my_label				= na
+	var int start_time				= na
+
+	v_position_y					= (switchFxMksPosY == 'top') ? _top : _bottom
+	v_label							= array.new_string()
+	v_chg							= _top - _bottom
+	
+	if _is_started
+		start_time					:= time
+	
+	if showFxMkSs_LabelName and not na(_text)
+		array.push(v_label, _text)
+
+	/// day
+	if showFxMkSs_LabelDay
+		array.push(v_label, FuncFxMkSs_GetDay(dayofweek(start_time, switchFxMksSession)))
+
+	/// price
+	if showFxMkSs_LabelPrice
+		array.push(v_label, str.format(vFxMkSs_FmtPrice, v_chg))
+
+	/// pip
+	if showFxMkSs_LabelPips
+		array.push(v_label, str.format(vFxMkSs_FmtPips, v_chg / vFxMkSsPips) + ' pips')
+
+	if _show
+		if _is_started
+			my_label				:= label.new(time, v_position_y, array.join(v_label, vFxMkSs_IconSeparator),
+				  textcolor			= color.new(_color, vFxMkSs_LineOpacity),
+				  color				= vFxMkSs_NoneColor,
+				  size				= switchFxMksSize,
+				  style				= vFxMkSs_LabelPosition,
+				  xloc				= xloc.bar_time,
+				  force_overlay		= true)
+			
+			if _delete_history
+				label.delete(my_label[1])
+
+		if _session
+			label.set_y(my_label, v_position_y)
+			label.set_text(my_label, array.join(v_label, vFxMkSs_IconSeparator))
+
+/// ─── Markets ───
+
+FuncFxMkSs_RenderSession(_show, _session, _is_started, _is_ended, _color, _top, _bottom, _extend, _is_extend, _delete_history) =>
+	var box my_box					= na
+
+	x0_1							= ta.valuewhen(na(_session[1]) and _session, bar_index, 1)
+	x0_2							= ta.valuewhen(na(_session) and _session[1], bar_index, 0)
+	var x1							= 0
+	var x2							= 0
+	var session_open				= 0.0
+	var session_high				= 0.0
+	var session_low					= 0.0
+
+	if _show
+		if _is_started
+			diff					= math.abs(x0_2 - x0_1)
+			x1						:= bar_index
+			x2						:= bar_index + (math.min(diff, vFxMkSs_MaxBars))
+			my_box					:= box.new(x1, _top, x2, _bottom,
+				  border_color		= color.new(_color, vFxMkSs_LineOpacity),
+				  border_width		= vFxMkSs_BorderWidth,
+				  border_style		= switchFxMksLines,
+				  bgcolor			= color.new(_color, vFxMkSs_BgOpacity),
+				  force_overlay		= true)
+
+			session_open			:= open
+			session_high			:= _top
+			session_low				:= _bottom
+
+			if _is_extend
+				box.set_extend(my_box, extend.right)
+
+			if _delete_history
+				box.delete(my_box[1])
+
+		else if _session
+			box.set_top(my_box, _top)
+			box.set_bottom(my_box, _bottom)
+
+			session_high			:= _top
+			session_low				:= _bottom
+		
+		else if _is_ended
+			session_open			:= na
+			box.set_right(my_box, bar_index)
+
+	[x1, x2, session_open, session_high, session_low]
+
+/// ─── Boxes
+draw(_show, _session, _color, _label, _extend, _lookback) =>
+	max								= FuncFxMkSs_GetPeriod(_session, 1, _lookback)
+	top								= ta.highest(high, max)
+	bottom							= ta.lowest(low, max)
+	
+	is_started						= FuncFxMkSs_GetStarted(_session)
+	is_ended						= FuncFxMkSs_GetEnded(_session)
+	is_extend						= _extend != vFxMkSs_No
+
+	delete_history					= (not showFxMkSs_History) or is_extend
+
+	[x1, x2, _open, _high, _low]	= FuncFxMkSs_RenderSession(_show, _session, is_started, is_ended, _color, top, bottom, _extend, is_extend, delete_history)
+
+	if showFxMkSs_Labels
+		FuncFxMkSs_RenderLabel(_show, _session, is_started, _color, top, bottom, _label, delete_history)
+
+	[_session, _open, _high, _low]
+
+/// ─── Killzones
+FuncFxMkSs_RenderKillZones(_on, _color) =>
+
+	var int Bar				= 0
+	var float High			= 0.0 
+	var float Low			= 0.0
+	var box BoX				= na
+	var label LabeL			= na 
+
+	if  (_on[1] == 0 and _on == 1)
+		Bar					:= bar_index
+		High				:= high
+		Low					:= low
+
+	else if (_on[1] == 1 and _on == 1)
+		High				:= math.max(high , High) 
+		Low					:= math.min(low , Low)
+
+	else if _on == 0
+		High				:= 0.0 
+		Low					:= 0.0
+		Bar					:= 0
+
+	if _on > _on[1]
+		BoX					:= box.new(bar_index, High, bar_index, Low,
+		  bgcolor			= color.new(_color, 80),
+		  border_color		= color.new(_color, 90),
+		  border_width		= 1,
+		  border_style		= optFxMkSs_BorderKillzone,
+		  force_overlay		= true)
+
+	if _on and _on == _on[1]
+		box.set_top(BoX, High)
+		box.set_bottom(BoX, Low)
+		box.set_right(BoX, bar_index)
+		label.set_x(LabeL,math.round(math.avg(Bar,bar_index)))
+		label.set_y(LabeL, High)
+
+	[High , Low ]
+
+//// ───────────────────────
+/// ─── FxMSs ───
+/// ─── Instances ───
+//// ───────────────────────
+
+/// ─── Timeframe
+string timeZo						= (switchFxMksSession == vFxMkSs_No or switchFxMksSession == '') ? na : switchFxMksSession
+
+/// ─── Timeframe London
+int timeMkSs_SessLon				= time(timeframe.period, vFxMkSs_SessLnTimeZ, timeZo)
+
+timeMkSs_KillLonOpen				= math.sign(nz(time(timeframe.period,	vFxMkSs_KillLonTimeOpen,	switchFxMksSession)))
+timeMkSs_KillLonRally				= math.sign(nz(time(timeframe.period,	vFxMkSs_KillLonTimeRally,	switchFxMksSession)))
+timeMkSs_KillLonClose				= math.sign(nz(time(timeframe.period,	vFxMkSs_KillLonTimeClose,	switchFxMksSession)))
+
+/// ─── Timeframe New York
+int timeMkSs_SessNewY				= time(timeframe.period, vFxMkSs_SessNyTimeZ, timeZo)
+
+timeMkSs_KillNwYOpen				= math.sign(nz(time(timeframe.period,	vFxMkSs_KillNwYTimeOpen,	switchFxMksSession)))
+timeMkSs_KillNwYRally				= math.sign(nz(time(timeframe.period,	vFxMkSs_KillNwYTimeRally,	switchFxMksSession)))
+timeMkSs_KillNwYClose				= math.sign(nz(time(timeframe.period,	vFxMkSs_KillNwYTimeClose,	switchFxMksSession)))
+
+/// ─── Timeframe Tokyo
+int timeMkSs_SessTyk				= time(timeframe.period, vFxMkSs_SessTkTimeZ, timeZo)
+
+/// ─── Timeframe Sydney
+int timeMkSs_SessSyd				= time(timeframe.period, vFxMkSs_SessSdTimeZ, timeZo)
+
+//// ───────────────────────
+/// ─── FxMSs ───
+/// ─── Drawing ───
+//// ───────────────────────
+
+/// ─── Session London
+[DRAWMkSsSessLon,		DwMkSsSessLon_Open,		DwMkSsSessLon_High,		DwMkSsSessLon_Low]				= draw(showFxMkSs_SessLon,	timeMkSs_SessLon,	vFxMkSs_SessLnColor,	vFxMkSs_SessLnLabel,	vFxMkSs_SessLnExtend,	vFxMkSs_Lookback)
+/// ─── Session New York
+[DRAWMkSsSessNewY,		DwMkSsSessNewY_Open,	DwMkSsSessNewY_High,	DwMkSsSessNewY_Low]				= draw(showFxMkSs_SessNy,	timeMkSs_SessNewY,	vFxMkSs_SessNyColor,	vFxMkSs_SessNyLabel,	vFxMkSs_SessNyExtend,	vFxMkSs_Lookback)
+/// ─── Session Tokyo
+[DRAWMkSsSessTyk,		DwMkSsSessTyk_Open,		DwMkSsSessTyk_High,		DwMkSsSessTyk_Low]				= draw(showFxMkSs_SessTk,	timeMkSs_SessTyk,	vFxMkSs_SessTkColor,	vFxMkSs_SessTkLabel,	vFxMkSs_SessTkExtend,	vFxMkSs_Lookback)
+/// ─── Session Sydney
+[DRAWMkSsSessSyd,		DwMkSsSessSyd_Open,		DwMkSsSessSyd_High,		DwMkSsSessSyd_Low]				= draw(showFxMkSs_SessSyd,	timeMkSs_SessSyd,	vFxMkSs_SessSdColor,	vFxMkSs_SessSdLabel,	vFxMkSs_SessSdExtend,	vFxMkSs_Lookback)
+
+/// ─── KillZones London
+if showFxMkSs_KillLonOpen
+	[DwMkSs_KillLon_Open, DwMkSs_KillLon_Op]			= FuncFxMkSs_RenderKillZones(timeMkSs_KillLonOpen,	vFxMkSs_KillLonColor)
+if showFxMkSs_KillLonRally
+	[DwMkSs_KillLon_Rally, DwMkSs_KillLon_Rl]			= FuncFxMkSs_RenderKillZones(timeMkSs_KillLonRally,	vFxMkSs_KillLonColor)
+if showFxMkSs_KillLonClose
+	[DwMkSs_KillLon_Close, DwMkSs_KillLon_Cl]			= FuncFxMkSs_RenderKillZones(timeMkSs_KillLonClose,	vFxMkSs_KillLonColor)
+
+/// ─── KillZones New York
+if showFxMkSs_KillNwYOpen
+	[DwMkSs_KillNwY_Open, DwMkSs_KillNwY_Op]			= FuncFxMkSs_RenderKillZones(timeMkSs_KillNwYOpen,	vFxMkSs_KillNwYColor)
+if showFxMkSs_KillNwYRally
+	[DwMkSs_KillNwY_Rally, DwMkSs_KillNwY_Rl]			= FuncFxMkSs_RenderKillZones(timeMkSs_KillNwYRally,	vFxMkSs_KillNwYColor)
+if showFxMkSs_KillNwYClose
+	[DwMkSs_KillNwY_Close, DwMkSs_KillNwY_Cl]			= FuncFxMkSs_RenderKillZones(timeMkSs_KillNwYClose,	vFxMkSs_KillNwYColor)
+
+//// ─────────────────────────────────────────────────────────────────────
+//// ─────────────────────────────────────────────────────────────────────
+//// ─────────────────────────────────────────────────────────────────────
+
+/// ╔═══════════════════════════════╗
+/// ║ 	Market Structure Oscilador	║
+/// ╚═══════════════════════════════╝
+
+//// ─────────────────────────────────────────────────────────────────────
+
+//// ───────────────────────
+/// ─── MS Oscil ───
+/// ─── Variables ──
+//// ───────────────────────
+
+msOscilOSCColorBuy	= AllenMint60
+msOscilOSCColorSell	= AllenSky10
+
+msOscilColorLong	= AllenMint60
+msOscilColorShort	= AllenSky10
+msOscilColorChUp	= AllenMint50
+msOscilColorChDn	= MongoSky10
+msOscilColorOsc		= BrLiYel30
+msOscilColorMid		= AllenMint10
+
+display				= display.all - display.status_line
+
+msOsc_VarsGroup		= 'Oscilador Market Structure'
+msWeightK1			= input.float	(defval = 1,							title = "  Escala Corta",					minval = 0,			group = msOsc_VarsGroup,	step=.1,		display = display)
+msWeightK2			= input.float	(defval = 3,							title = "  Escala Intermedia",				minval = 0,			group = msOsc_VarsGroup,	step=.1,		display = display)
+msWeightK3			= input.float	(defval = 2,							title = "  Escala Larga",					minval = 0,			group = msOsc_VarsGroup,	step=.1,		display = display)
+norm_Smooth			= input.int		(defval = 4,							title = '  Oscilador Suavizado',			minval = 1,			group = msOsc_VarsGroup,					display = display)
+
+msOsc_Group			= 'Oscilador Gradiente'
+msOsc_Show			= input			(defval = true,							title = "Oscilador Cycle - Gradiente",							group = msOsc_Group)
+msBullColor			= input.color	(color.new(msOscilColorLong, 0),		title = 'Compra      ',											group = msOsc_Group,	inline = 'MS')
+msBearColor			= input.color	(color.new(msOscilColorShort, 0),		title = 'Venta',												group = msOsc_Group,	inline = 'MS')
+
+cyc_Group			= 'Oscilador Cycle'
+cycleOpt			= input			(defval = true,							title = "Oscilador Cycle - Histograma",							group = cyc_Group)
+cyc_Smooth			= input.int		(defval = 7,							title = '  Cycle Marca Longitud',			minval = 1,			group = cyc_Group,						display = display)
+cBullColor			= input.color	(color.new(msOscilColorLong, 20),		title = 'Compra      ',											group = cyc_Group,		inline = 'CYC')
+cBearColor			= input.color	(color.new(msOscilColorShort, 20),		title = 'Venta',												group = cyc_Group,		inline = 'CYC')
+
+oscSig				= input			(defval = true,							title = "Oscilador Cycle - Gradiente (Confirmaciones)",			group = msOsc_Group)
+oBullColor			= input.color	(msOscilColorLong,						title = 'Compra      ',											group = msOsc_Group,	inline = 'SIG')
+oBearColor			= input.color	(msOscilColorShort,						title = 'Venta',												group = msOsc_Group,	inline = 'SIG')
+
+cycleSig			= input			(defval = true,							title = "Oscilador Cycle - Histograma (Confirmaciones)",		group = cyc_Group)
+sBullColor			= input.color	(color.new(msOscilColorLong, 0),		title = 'Compra      ',											group = cyc_Group,		inline = 'SIG')
+sBearColor			= input.color	(color.new(msOscilColorShort, 0),		title = 'Venta',												group = cyc_Group,		inline = 'SIG')
+
+cycMix_Group		= 'Oscilador Dual'
+msOsCycleSig		= input			(defval = true,							title = "Dual Cycle - Gradie & Histo (Confirmaciones)",			group = cycMix_Group)
+msMarcaV1			= input			(defval = 50,							title = " Dual Venta ",											group = cycMix_Group,	inline = 'mM1w')
+msMarcaV2			= input			(defval = 50,							title = " & ",													group = cycMix_Group,	inline = 'mM1w')
+
+msMarcaC1			= input			(defval = 50,							title = " Dual Compra",											group = cycMix_Group,	inline = 'mM2w')
+msMarcaC2			= input			(defval = 50,							title = " & ",													group = cycMix_Group,	inline = 'mM2w')
+
+sMixBullColor		= input.color	(color.new(msOscilColorLong, 0),		title = 'Compra      ',											group = cycMix_Group,	inline = 'SIM')
+sMixBearColor		= input.color	(color.new(msOscilColorShort, 0),		title = 'Venta',												group = cycMix_Group,	inline = 'SIM')
+
+genericGroup		= 'Market Structure en Gráfico'
+msOnChart1			= input			(defval = true,							title = "Estructura de rango Corto",							group = genericGroup)
+msOnChartK1			= input.string	(defval = '···',						title = '  Linea',		options = ['───', '---', '···'],		group = genericGroup,	inline = 'K1',	display = display)
+stMSLblK1T			= input.string	(defval = 'Disabled',					title = 'Tags',			options = ['Enabled', 'Disabled'],		group = genericGroup,	inline = 'K1',	display = display),	stMSLblK1 = stMSLblK1T == 'Enabled'
+cBullColorK1		= input.color	(color.new(msOscilColorChUp, 35),		title = 'Compra      ', 										group = genericGroup,	inline = 'K1c')
+cBearColorK1		= input.color	(color.new(msOscilColorChDn, 35),		title = 'Venta',												group = genericGroup,	inline = 'K1c')
+
+msOnChart2			= input			(defval = true,							title = "Estructura de rango Intermedio",						group = genericGroup)
+msOnChartK2			= input.string	(defval = '---',						title = '  Linea',		options = ['───', '---', '···'],		group = genericGroup,	inline = 'K2',	display = display)
+stMSLblK2T			= input.string	(defval = 'Disabled',					title = 'Tags',			options = ['Enabled', 'Disabled'],		group = genericGroup,	inline = 'K2',	display = display),	stMSLblK2 = stMSLblK2T == 'Enabled'
+cBullColorK2		= input.color	(color.new(msOscilColorChUp, 35),		title = 'Compra      ',											group = genericGroup,	inline = 'K2c')
+cBearColorK2		= input.color	(color.new(msOscilColorChDn, 35),		title = 'Venta',												group = genericGroup,	inline = 'K2c')
+
+msOnChart3			= input			(defval = true,							title = "Estructura de rango Largo", 							group = genericGroup)
+msOnChartK3			= input.string	(defval = '───',						title = '  Linea',		options = ['───', '---', '···'],		group = genericGroup,	inline = 'K3',	display = display)
+stMSLblK3T			= input.string	(defval = 'Enabled',					title = 'Tags',			options = ['Enabled', 'Disabled'],		group = genericGroup,	inline = 'K3',	display = display),	stMSLblK3 = stMSLblK3T == 'Enabled'
+cBullColorK3		= input.color	(color.new(msOscilColorChUp, 35),		title = 'Compra      ',											group = genericGroup,	inline = 'K3c')
+cBearColorK3		= input.color	(color.new(msOscilColorChDn, 35),		title = 'Venta',												group = genericGroup,	inline = 'K3c')
+
+msOscCG				= 'Rango de Oscilador'
+msDataK1			= input			(false,									title = "Oscilador de rango Corto",								group = msOscCG,		inline = 'k1w')
+msColorK1			= input			(color.new(msOscilColorOsc, 50),		title = "",														group = msOscCG,		inline = 'k1w')
+
+msDataK2			= input			(false,									title = "Oscilador de rango Medio",								group = msOscCG,		inline = 'k2w')
+msColorK2			= input			(color.new(msOscilColorOsc, 50),		title = "",														group = msOscCG,		inline = 'k2w')
+
+msDataK3			= input			(false,									title = "Oscilador de rango Largo",								group = msOscCG,		inline = 'k3w')
+msColorK3			= input			(color.new(msOscilColorOsc, 50),		title = "",														group = msOscCG,		inline = 'k3w')
+
+//// ───────────────────────
+/// ─── MS Oscil ───
+/// ─── Types ──
+//// ───────────────────────
+
+type BAR
+	float   open	= open
+	float   high	= high
+	float   low		= low
+	float   close	= close
+	int     index	= bar_index
+
+type SWINGS
+	float	lastPrice
+	float	midPrice
+	float	prevPrice
+
+	int		lastIndex
+	int		midIndex
+	int		prevIndex
+
+	bool	isCrossed
+
+type MS
+	int		type = 0
+
+//// ───────────────────────
+/// ─── MS Oscil ───
+/// ─── Instances ──
+//// ───────────────────────
+
+BAR bar	= BAR.new()
+
+var SWINGS stLow	= SWINGS.new()
+var SWINGS stHigh	= SWINGS.new()
+var MS stMS			= MS.new()
+
+var SWINGS itLow	= SWINGS.new()
+var SWINGS itHigh	= SWINGS.new()
+var MS itMS			= MS.new()
+
+var SWINGS ltLow	= SWINGS.new()
+var SWINGS ltHigh	= SWINGS.new()
+var MS ltMS			= MS.new()
+
+//// ───────────────────────
+/// ─── MS Oscil ───
+/// ─── Functions ──
+//// ───────────────────────
+
+lineStyle(styleInText) =>
+	switch styleInText
+		"───"		=> line.style_solid				//  Solid
+		"---"		=> line.style_dashed			//  Dashed
+		"···"		=> line.style_dotted			//  Dotted
+		=> line.style_solid
+
+queryPatterns(lastPrice, midPrice, prevPrice, isSwingHigh) =>
+	if isSwingHigh
+		prevPrice < midPrice and midPrice >= lastPrice
+	else
+		prevPrice > midPrice and midPrice <= lastPrice
+
+method queryPatterns(SWINGS this, isSwingHigh) =>
+	if isSwingHigh
+		this.prevPrice < this.midPrice and this.midPrice >= this.lastPrice
+	else
+		this.prevPrice > this.midPrice and this.midPrice <= this.lastPrice
+
+method updatePattern(SWINGS this, price, index) =>
+	this.isCrossed := false
+	this.prevPrice := this.midPrice, this.midPrice := this.lastPrice, this.lastPrice := price
+	this.prevIndex := this.midIndex, this.midIndex := this.lastIndex, this.lastIndex := index
+
+method setType(MS this, value) =>
+	this.type := value
+
+normalize(buy, sell, smooth) =>
+	var os = 0
+	var float max = na
+	var float min = na
+	os := buy ? 1 : sell ? -1 : os
+	
+	max := os > os[1] ? bar.close : os < os[1] ? max : math.max(bar.close, max)
+	min := os < os[1] ? bar.close : os > os[1] ? min : math.min(bar.close, min)
+
+	ta.sma((bar.close - min)/(max - min), smooth) * 100
+
+shortMarketStructure() => 
+
+	bull = false
+	bear = false
+
+	if queryPatterns(high, high[1], high[2], true )
+		stHigh.updatePattern(high[1], bar_index[1])
+		stHigh.isCrossed := false
+
+	if bar.close > stHigh.lastPrice and not stHigh.isCrossed
+		stHigh.isCrossed := true
+		bull := true
+
+	if queryPatterns(low , low[1] , low[2] , false) 
+		stLow.isCrossed := false
+		stLow.updatePattern(low[1], bar_index[1])
+
+	if bar.close < stLow.lastPrice and not stLow.isCrossed
+		stLow.isCrossed := true
+		bear := true
+
+	normalize(bull, bear, norm_Smooth)
+
+marketStructure(SWINGS hSwingHigh, SWINGS hSwingLow, SWINGS lSwingHigh, SWINGS lSwingLow) => 
+
+	bull = false
+	bear = false 
+
+	cSwingHigh = lSwingHigh.queryPatterns(true)
+
+	if cSwingHigh and cSwingHigh != cSwingHigh[1]
+		hSwingHigh.updatePattern(lSwingHigh.midPrice, lSwingHigh.midIndex)
+		hSwingHigh.isCrossed := false
+
+	if bar.close > hSwingHigh.lastPrice and not hSwingHigh.isCrossed
+		hSwingHigh.isCrossed := true
+		bull := true
+
+	cSwingLow = lSwingLow.queryPatterns(false)
+
+	if cSwingLow and cSwingLow != cSwingLow[1]
+		hSwingLow.updatePattern(lSwingLow.midPrice, lSwingLow.midIndex)
+		hSwingLow.isCrossed := false
+
+	if bar.close < hSwingLow.lastPrice and not hSwingLow.isCrossed
+		hSwingLow.isCrossed := true
+		bear := true
+
+	normalize(bull, bear, norm_Smooth)
+
+collectData() => [shortMarketStructure(), marketStructure(itHigh, itLow, stHigh, stLow), marketStructure(ltHigh, ltLow, itHigh, itLow)]
+
+//// ───────────────────────
+/// ─── MS Oscil ───
+/// ─── Maths ──
+//// ───────────────────────
+
+log.info("yaz_kizim {0} {1}", ltHigh.lastPrice, ltHigh.isCrossed)
+
+if msOnChart1
+	if bar.close > stHigh.lastPrice and not stHigh.isCrossed
+		line.new(stHigh.lastIndex, stHigh.lastPrice, bar.index, stHigh.lastPrice,		color = cBullColorK1,	style = lineStyle(msOnChartK1),	width = 1,	force_overlay = true)
+
+		if stMSLblK1
+			box.new(stHigh.lastIndex, stHigh.lastPrice, bar.index, stHigh.lastPrice,	color(na), text = stMS.type < 0 ? 'CHoCH' : 'BoS',	text_color = cBullColorK1,	text_size = size.tiny, text_halign = text.align_left, text_valign = text.align_bottom, force_overlay = true)
+			stMS.setType(1)
+
+	if bar.close < stLow.lastPrice and not stLow.isCrossed
+		line.new(stLow.lastIndex, stLow.lastPrice, bar.index, stLow.lastPrice,			color = cBearColorK1,	style = lineStyle(msOnChartK1),	width = 1,	force_overlay = true)
+
+		if stMSLblK1
+			box.new(stLow.lastIndex, stLow.lastPrice, bar.index, stLow.lastPrice,		color(na), text = stMS.type > 0 ? 'CHoCH' : 'BoS',	text_color = cBearColorK1,	text_size = size.tiny, text_halign = text.align_left, text_valign = text.align_top, force_overlay = true)
+			stMS.setType(-1)
+
+if msOnChart2
+	if bar.close > itHigh.lastPrice and not itHigh.isCrossed
+		line.new(itHigh.lastIndex, itHigh.lastPrice, bar.index, itHigh.lastPrice,		color = cBullColorK2,	style = lineStyle(msOnChartK2),	width = 1,	force_overlay = true)
+		if stMSLblK2
+			box.new(itHigh.lastIndex, itHigh.lastPrice, bar.index, itHigh.lastPrice,	color(na), text = itMS.type < 0 ? 'CHoCH' : 'BoS',	text_color = cBullColorK2,	text_size = size.tiny, text_halign = text.align_left, text_valign = text.align_bottom, force_overlay = true)
+			itMS.setType(1)
+
+	if bar.close < itLow.lastPrice and not itLow.isCrossed
+		line.new(itLow.lastIndex, itLow.lastPrice, bar.index, itLow.lastPrice,			color = cBearColorK2,	style = lineStyle(msOnChartK2),	width = 1,	force_overlay = true)
+		if stMSLblK2
+			box.new(itLow.lastIndex, itLow.lastPrice, bar.index, itLow.lastPrice,		color(na), text = itMS.type > 0 ? 'CHoCH' : 'BoS',	text_color = cBearColorK2,	text_size = size.tiny, text_halign = text.align_left, text_valign = text.align_top, force_overlay = true)
+			itMS.setType(-1)
+
+if msOnChart3
+	if bar.close > ltHigh.lastPrice and not ltHigh.isCrossed
+		line.new(ltHigh.lastIndex, ltHigh.lastPrice, bar.index, ltHigh.lastPrice,		color = cBullColorK3,	style = lineStyle(msOnChartK3),	width = 1,	force_overlay = true)
+
+		if stMSLblK3
+			box.new(ltHigh.lastIndex, ltHigh.lastPrice, bar.index, ltHigh.lastPrice,	color(na), text = ltMS.type < 0 ? 'CHoCH' : 'BoS',	text_color = cBullColorK3,	text_size = size.tiny, text_halign = text.align_left, text_valign = text.align_bottom, force_overlay = true)
+			ltMS.setType(1)
+
+	if bar.close < ltLow.lastPrice and not ltLow.isCrossed
+		line.new(ltLow.lastIndex, ltLow.lastPrice, bar.index, ltLow.lastPrice,			color = cBearColorK3,	style = lineStyle(msOnChartK3),	width = 1,	force_overlay = true)
+
+		if stMSLblK3
+			box.new(ltLow.lastIndex, ltLow.lastPrice, bar.index, ltLow.lastPrice,		color(na), text = ltMS.type > 0 ? 'CHoCH' : 'BoS', text_color = cBearColorK3, text_size = size.tiny, text_halign = text.align_left, text_valign = text.align_top, force_overlay = true)
+			ltMS.setType(-1)
+
+//// ───────────────────────
+/// ─── MS Oscil ───
+/// ─── Oscilador ──
+//// ───────────────────────
+
+/// ─── Lineal
+oscTop				= plot(msOsc_Show or msDataK1 or msDataK2 or msDataK3 ? 100 : na,	'OSC Max',			color(na),						display = display.none,	editable = false)
+upperBand			= plot(msOsc_Show or msDataK1 or msDataK2 or msDataK3 ? 85 : na,	'Sobrecompra',		color(na),						display = display.none,	editable = false)
+midLine				= plot(msOsc_Show or msDataK1 or msDataK2 or msDataK3 ? 50 : na,	'Equilibrio',		color.new(msOscilColorMid, 50),	display = display,		editable = false)
+lowerBand			= plot(msOsc_Show or msDataK1 or msDataK2 or msDataK3 ? 15 : na,	'Sobreventa',		color(na),						display = display.none,	editable = false)
+oscBtm				= plot(msOsc_Show or msDataK1 or msDataK2 or msDataK3 ? 0 : na,		'OSC Min',			color(na),						display = display.none,	editable = false)
+
+fill				(oscTop, upperBand, 100, 85,	top_color = color.new(msBearColor, 100),	bottom_color = color.new(msBearColor, 65),		title = "Area de Sobrecompra")
+fill				(lowerBand, oscBtm, 15, 0,		top_color = color.new(msBullColor, 65),		bottom_color = color.new(msBullColor, 100),		title = "Area de Sobreventa")
+
+[stValue1, stValue2, stValue3] = collectData()
+
+/// ─── Oscilador
+msOSC				= (msWeightK1 * nz(stValue1, 0) + msWeightK2 * nz(stValue2, 0) + msWeightK3 * nz(stValue3, 0)) / (msWeightK1 * (na(stValue1) ? 0 : 1) + msWeightK2 * (na(stValue2) ? 0 : 1) + msWeightK3 * (na(stValue3) ? 0 : 1))
+msPlot				= plot(msOsc_Show ? msOSC : na,		'Oscilador Market Structure',			color.from_gradient(msOSC, 0, 100, msBearColor, msBullColor), 1,	display = display)
+
+if oscSig and ta.change(math.sign(msOSC - 12)) > 0 
+	label.new(bar.index, bar.low, '▢',	color = color(na),	textcolor = color.new(msOscilOSCColorBuy, 40),	size = size.normal,	style = label.style_label_up,	force_overlay = true)
+if oscSig and ta.change(math.sign(msOSC - 80)) < 0 
+	label.new(bar.index, bar.high, '▢',	color = color(na),	textcolor = color.new(msOscilOSCColorSell, 40),	size = size.normal,	style = label.style_label_down,	force_overlay = true)
+
+/// ─── Histogram Cycle
+plot				(msDataK1 ? stValue1 : na,			'Oscilador de rango corto',				msColorK1,	1,	display = display)
+plot				(msDataK2 ? stValue2 : na,			'oscilador de rango Intermedio',		msColorK2,	1,	display = display)
+plot				(msDataK3 ? stValue3 : na,			'Oscilador de rango Largo',				msColorK3,	1,	display = display)
+
+cycleFast			= cycleOpt ? msOSC - ta.ema(msOSC, cyc_Smooth) + 50 : 50
+plotcandle			(50., 50., 50., cycleFast,			'Histograma
+
+ Cycle',	cycleFast > 50 ? cBullColor : cBearColor,	display = display,	bordercolor = cycleOpt ? cycleFast > 50 ? cBullColor : cBearColor : color.gray)
+
+if cycleSig and ta.change(math.sign(cycleFast - 35)) > 0 
+	label.new(bar.index, bar.low, '△',	color = color(na),	textcolor = color.new(msOscilOSCColorBuy, 50),	size = size.normal,	style = label.style_label_up,	force_overlay = true)
+if cycleSig and ta.change(math.sign(msOSC - 37)) and ta.change(math.sign(cycleFast - 36)) < 0 
+	label.new(bar.index, bar.high, '▽',	color = color(na),	textcolor = color.new(msOscilOSCColorSell, 50),	size = size.normal,	style = label.style_label_down,	force_overlay = true)
+if cycleSig and ta.change(math.sign(msOSC - 40)) and ta.change(math.sign(cycleFast - 50)) > 0 
+	label.new(bar.index, bar.low, '△',	color = color(na),	textcolor = color.new(msOscilOSCColorBuy, 30),	size = size.normal,	style = label.style_label_up,	force_overlay = true)
+if cycleSig and ta.change(math.sign(msOSC - 60)) and ta.change(math.sign(cycleFast - 50)) < 0 
+	label.new(bar.index, bar.high, '▽',	color = color(na),	textcolor = color.new(msOscilOSCColorSell, 30),	size = size.normal,	style = label.style_label_down,	force_overlay = true)
+
+/// ─── Mix Bull
+if msOsCycleSig and ta.change(math.sign(msOSC - 20)) and ta.change(math.sign(cycleFast - 54)) > 0 
+	label.new(bar.index, bar.low, '▲',	color = color(na),	textcolor = color.new(msOscilOSCColorBuy, 10),	size = size.large,	style = label.style_label_up,	force_overlay = true)
+if msOsCycleSig and ta.change(math.sign(msOSC - 30)) and ta.change(math.sign(cycleFast - 46)) > 0 
+	label.new(bar.index, bar.low, '▲',	color = color(na),	textcolor = color.new(msOscilOSCColorBuy, 40),	size = size.large,	style = label.style_label_up,	force_overlay = true)
+if msOsCycleSig and ta.change(math.sign(msOSC - 47)) and ta.change(math.sign(cycleFast - 38)) > 0 
+	label.new(bar.index, bar.low, '▲',	color = color(na),	textcolor = color.new(msOscilOSCColorBuy, 40),	size = size.normal,	style = label.style_label_up,	force_overlay = true)
+if msOsCycleSig and ta.change(math.sign(msOSC - 60)) and ta.change(math.sign(cycleFast - 40)) > 0 
+	label.new(bar.index, bar.low, '▲',	color = color(na),	textcolor = color.new(msOscilOSCColorBuy, 40),	size = size.normal,	style = label.style_label_up,	force_overlay = true)
+if msOsCycleSig and ta.change(math.sign(msOSC - 65)) and ta.change(math.sign(cycleFast - 53)) > 0 
+	label.new(bar.index, bar.low, '▲',	color = color(na),	textcolor = color.new(msOscilOSCColorBuy, 40),	size = size.normal,	style = label.style_label_up,	force_overlay = true)
+if msOsCycleSig and ta.change(math.sign(msOSC - 55)) and ta.change(math.sign(cycleFast - 46)) > 0 
+	label.new(bar.index, bar.low, '▲',	color = color(na),	textcolor = color.new(msOscilOSCColorBuy, 40),	size = size.normal,	style = label.style_label_up,	force_overlay = true)
+if msOsCycleSig and ta.change(math.sign(msOSC - 45)) and ta.change(math.sign(cycleFast - 30)) > 0 
+	label.new(bar.index, bar.low, '▲',	color = color(na),	textcolor = color.new(msOscilOSCColorBuy, 50),	size = size.small,	style = label.style_label_up,	force_overlay = true)
+if msOsCycleSig and ta.change(math.sign(msOSC - 75)) and ta.change(math.sign(cycleFast - 63)) > 0 
+	label.new(bar.index, bar.low, '▲',	color = color(na),	textcolor = color.new(msOscilOSCColorBuy, 50),	size = size.small,	style = label.style_label_up,	force_overlay = true)
+if msOsCycleSig and ta.change(math.sign(msOSC - 73)) and ta.change(math.sign(cycleFast - 57)) > 0 
+	label.new(bar.index, bar.low, '▲',	color = color(na),	textcolor = color.new(msOscilOSCColorBuy, 50),	size = size.small,	style = label.style_label_up,	force_overlay = true)
+if msOsCycleSig and ta.change(math.sign(msOSC - 70)) and ta.change(math.sign(cycleFast - 54)) > 0 
+	label.new(bar.index, bar.low, '▲',	color = color(na),	textcolor = color.new(msOscilOSCColorBuy, 50),	size = size.small,	style = label.style_label_up,	force_overlay = true)
+if msOsCycleSig and ta.change(math.sign(msOSC - 90)) and ta.change(math.sign(cycleFast - 55)) > 0 
+	label.new(bar.index, bar.low, '▲',	color = color(na),	textcolor = color.new(msOscilOSCColorBuy, 50),	size = size.small,	style = label.style_label_up,	force_overlay = true)
+
+/// ─── Mix Bear
+if msOsCycleSig and ta.change(math.sign(msOSC - 80)) and ta.change(math.sign(cycleFast - 47)) < 0 
+	label.new(bar.index, bar.high, '▼',	color = color(na),	textcolor = color.new(msOscilOSCColorSell, 10),	size = size.large,	style = label.style_label_down,	force_overlay = true)
+if msOsCycleSig and ta.change(math.sign(msOSC - 85)) and ta.change(math.sign(cycleFast - 47)) < 0 
+	label.new(bar.index, bar.high, '▼',	color = color(na),	textcolor = color.new(msOscilOSCColorSell, 10),	size = size.large,	style = label.style_label_down,	force_overlay = true)
+if msOsCycleSig and ta.change(math.sign(msOSC - 90)) and ta.change(math.sign(cycleFast - 55)) < 0 
+	label.new(bar.index, bar.high, '▼',	color = color(na),	textcolor = color.new(msOscilOSCColorSell, 40),	size = size.normal,	style = label.style_label_down,	force_overlay = true)
+if msOsCycleSig and ta.change(math.sign(msOSC - 75)) and ta.change(math.sign(cycleFast - 55)) < 0 
+	label.new(bar.index, bar.high, '▼',	color = color(na),	textcolor = color.new(msOscilOSCColorSell, 40),	size = size.normal,	style = label.style_label_down,	force_overlay = true)
+if msOsCycleSig and ta.change(math.sign(msOSC - 70)) and ta.change(math.sign(cycleFast - 60)) < 0 
+	label.new(bar.index, bar.high, '▼',	color = color(na),	textcolor = color.new(msOscilOSCColorSell, 40),	size = size.normal,	style = label.style_label_down,	force_overlay = true)
+if msOsCycleSig and ta.change(math.sign(msOSC - 70)) and ta.change(math.sign(cycleFast - 65)) < 0 
+	label.new(bar.index, bar.high, '▼',	color = color(na),	textcolor = color.new(msOscilOSCColorSell, 40),	size = size.normal,	style = label.style_label_down,	force_overlay = true)
+if msOsCycleSig and ta.change(math.sign(msOSC - 85)) and ta.change(math.sign(cycleFast - 70)) < 0 
+	label.new(bar.index, bar.high, '▼',	color = color(na),	textcolor = color.new(msOscilOSCColorSell, 50),	size = size.small,	style = label.style_label_down,	force_overlay = true)
+if msOsCycleSig and ta.change(math.sign(msOSC - 20)) and ta.change(math.sign(cycleFast - 40)) < 0 
+	label.new(bar.index, bar.high, '▼',	color = color(na),	textcolor = color.new(msOscilOSCColorSell, 50),	size = size.small,	style = label.style_label_down,	force_overlay = true)
+if msOsCycleSig and ta.change(math.sign(msOSC - 30)) and ta.change(math.sign(cycleFast - 45)) < 0 
+	label.new(bar.index, bar.high, '▼',	color = color(na),	textcolor = color.new(msOscilOSCColorSell, 50),	size = size.small,	style = label.style_label_down,	force_overlay = true)
+if msOsCycleSig and ta.change(math.sign(msOSC - 36)) and ta.change(math.sign(cycleFast - 45)) < 0 
+	label.new(bar.index, bar.high, '▼',	color = color(na),	textcolor = color.new(msOscilOSCColorSell, 50),	size = size.small,	style = label.style_label_down,	force_overlay = true)
+
+if msOsCycleSig and ta.change(math.sign(msOSC - 15)) and ta.change(math.sign(cycleFast - 50)) > 0
+	label.new(bar.index, bar.low, '◓',		color = color(na),		textcolor = msOscilOSCColorBuy,		size = size.normal,		style = label.style_label_up,	force_overlay = true)
+if msOsCycleSig and ta.change(math.sign(msOSC - 85)) and ta.change(math.sign(cycleFast - 50)) < 0 
+	label.new(bar.index, bar.high, '◒',		color = color(na),		textcolor = msOscilOSCColorSell,	size = size.normal,		style = label.style_label_up,	force_overlay = true)
+
+fill		(msPlot, midLine, 100, cycleOpt ? 60 : 50, top_color = color.new(msBullColor,   0), bottom_color = color.new(msBullColor, 100), title = "Bullish Gradient Fill")
+fill		(msPlot, midLine,  cycleOpt ? 40 : 50,  0, top_color = color.new(msBearColor, 100), bottom_color = color.new(msBearColor,   0), title = "Bearish Gradient Fill")
+
+//// ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+//// ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+//// ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+/// ╔═══════════════════════════╗
+/// ║  Tsi & Divergences		║
+/// ╔═══════════════════════════╗
+/// ║ 	RSI Supertrend			║
+/// ║ 	@	Allen	㔬			║
+/// ╚═══════════════════════════╝
+
+//// ─────────────────────────────────────────────────────────────────────
+
+/// ╔═══════════════════════════╗
+/// ║ 	RSI Supertrend			║
+/// ║ 	@	Allen	㔬			║
+/// ╚═══════════════════════════╝
+
+//// ─────────────────────────────────────────────────────────────────────
+
+sTrendColorUp					= input.color(AllenMint60,				title = "Compra")
+sTrendColorDown					= input.color(AllenSky10,				title = "Venta")
+sTrendColorBase					= input.color(ARoPrimary,				title = "Marcas de SC / SV")
+sTrendColorMa					= input		(BrLiYel10,					title = "Area Media")
+sTrendColorRSI					= input		(BrLiYel10,					title = "RSI")
+
+//// ───────────────────────
+/// ─── Supertrend Rsi
+/// ─── Variables ────
+//// ───────────────────────
+
+sTrendShowSuperT				= input.bool	(defval = true,			title = "Visualizar Supertrend",	group = "RSI Settings")
+
+sTrendRSILength					= input.int		(defval = 14,			title = "Longitud RSI",				group = "RSI Settings")
+sTrendSmoothingLength			= input.int		(defval = 21,			title = "Longitud RSI Suavisado",	group = "RSI Settings")
+sTrendIShowSmoothed				= input.bool	(defval = false,		title = "Suavisado RSI",			group = "RSI Settings")
+
+sTrendMovingAverageLength		= input.int		(defval = 14,			title = "Longitud MA",				group = "MA Settings",			display = display.data_window)
+sTrendMovingAverageType			= input.string	(defval = "HMA",		title = "Tipo MA",					group = "MA Settings",			options = ["SMA", "HMA", "EMA", "SMMA", "WMA", "VWMA"],	display = display.data_window)
+sTrendShowMovingAverage			= input.bool	(defval = true,			title = "Visualizar RSI MA",		group = "MA Settings")
+
+sTrendFactor					= input.float	(defval = 0.8,			title = "Factor",					group = "Super Trend Settings")
+sTrendAverageTrueRangeLength	= input.int		(defval = 10,			title = "Longitud ATR",				group = "Super Trend Settings")
+
+//// ───────────────────────
+/// ─── Types ───
+//// ───────────────────────
+
+type OHL
+	float O = open
+	float H = high
+	float L = low
+	float C = close
+	float V = volume
+	int   I = bar_index
+
+/// ───────────────────────
+/// ─── Instances
+/// ───────────────────────
+
+ohl = OHL.new()
+
+//// ───────────────────────
+/// ─── Supertrend Rsi
+/// ─── Funciones ────
+//// ───────────────────────
+
+/// ─── ma function
+FusTrendCalculateMA(source, length, type) =>
+	switch type
+		"SMA"	=> ta.sma	(source, length)
+		"HMA"	=> ta.hma	(source, length)
+		"EMA"	=> ta.ema	(source, length)
+		"SMMA"	=> ta.rma	(source, length)
+		"WMA"	=> ta.wma	(source, length)
+		"VWMA"	=> ta.vwma	(source, length)
+
+/// ─── Calculo ATR
+FusTrendCalculateATR(source, atrLength) =>
+	FusTHighestHigh	= ta.highest(source, atrLength)
+	FusTLowestLow	= ta.lowest(source, atrLength)
+	FusTTrueRange	= na(FusTHighestHigh[1]) ? FusTHighestHigh - FusTLowestLow : math.max(FusTHighestHigh - FusTLowestLow, math.abs(FusTHighestHigh - source[1]), math.abs(FusTLowestLow - source[1]))
+	ta.rma(FusTTrueRange, atrLength)
+
+//// ───────────────────────
+/// ─── Supertrend Rsi
+/// ─── Math ─────────
+//// ───────────────────────
+
+/// ─── Function to calculate Supertrend
+FusTrendCalculateSupertrend(factor, ATRLength, source) =>
+	FusTPriceSource						= source
+	FusTATR								= FusTrendCalculateATR(source, ATRLength)
+	FusTUpperBand						= FusTPriceSource + factor * FusTATR
+	FusTLowerBand						= FusTPriceSource - factor * FusTATR
+	FusTPrevLowerBand					= nz(FusTLowerBand[1])
+	FusTPrevUpperBand					= nz(FusTUpperBand[1])
+	FusTLowerBand						:= FusTLowerBand > FusTPrevLowerBand or source[1] < FusTPrevLowerBand ? FusTLowerBand : FusTPrevLowerBand
+	FusTUpperBand						:= FusTUpperBand < FusTPrevUpperBand or source[1] > FusTPrevUpperBand ? FusTUpperBand : FusTPrevUpperBand
+	int FusTTrendDirection				= na
+	float FusTSupertrendValue			= na
+	FusTPrevSupertrend					= FusTSupertrendValue[1]
+	if na(FusTATR[1])
+		FusTTrendDirection				:= 1
+	else if FusTPrevSupertrend			== FusTPrevUpperBand
+		FusTTrendDirection				:= source > FusTUpperBand ? -1 : 1
+	else
+		FusTTrendDirection				:= source < FusTLowerBand ? 1 : -1
+	FusTSupertrendValue					:= FusTTrendDirection == -1 ? FusTLowerBand : FusTUpperBand
+	[FusTSupertrendValue, FusTTrendDirection]
+
+/// ─── Calculete Rsi ───────
+sTrendRsiValue							= sTrendIShowSmoothed and sTrendShowSuperT ? ta.hma(ta.rsi(ohl.C, sTrendRSILength), sTrendSmoothingLength) : ta.rsi(ohl.C, sTrendRSILength)
+sTrendRsiMovingAverage					= FusTrendCalculateMA(sTrendRsiValue, sTrendMovingAverageLength, sTrendMovingAverageType)
+
+/// ─── Calculating Supertrend based on RSI values
+[sTrendRsiSupertrend, FusTTrendDirection] = FusTrendCalculateSupertrend(sTrendFactor, sTrendAverageTrueRangeLength, sTrendRsiValue)
+
+//// ───────────────────────
+/// ─── Supertrend Rsi
+/// ─── Visual ───────
+//// ───────────────────────
+
+/// ─── Plot RSI / MA
+sTrendSupertrendPlot					= plot(sTrendRsiSupertrend,					color = FusTTrendDirection == -1 ? sTrendColorUp : sTrendColorDown,						title = "Supertrend")
+sTrendRsiPlot							= plot(sTrendRsiValue,						color = FusTTrendDirection == -1 ? sTrendColorUp : sTrendColorDown,		linewidth = 2,	title = "")
+
+/// ─── Lines OverBought /OverSold
+plot(80,								color = color.from_gradient(sTrendRsiValue, 60, 80, color.new(sTrendColorBase, 73),		color.new(sTrendColorDown, 0)),					title = "",		linewidth = 6,	editable = false)
+plot(20,								color = color.from_gradient(sTrendRsiValue, 20, 40, color.new(sTrendColorUp, 0),		color.new(sTrendColorBase, 73)),				title = "",		linewidth = 6,	editable = false)
+
+plot(75,								color = color.from_gradient(sTrendRsiValue, 60, 75, color.new(sTrendColorBase, 73),		color.new(sTrendColorDown, 0)),					title = "",		linewidth = 8,	editable = false)
+plot(25,								color = color.from_gradient(sTrendRsiValue, 25, 40, color.new(sTrendColorUp, 0),		color.new(sTrendColorBase, 73)),				title = "",		linewidth = 8,	editable = false)
+
+plot(70,								color = color.from_gradient(sTrendRsiValue, 50, 70, color.new(sTrendColorBase, 73),		color.new(sTrendColorDown, 0)),					title = "",		linewidth = 6,	editable = false)
+plot(30,								color = color.from_gradient(sTrendRsiValue, 30, 50, color.new(sTrendColorUp, 0),		color.new(sTrendColorBase, 73)),				title = "",		linewidth = 6,	editable = false)
+
+
+/// ─── Filling ───────
+fill(sTrendSupertrendPlot, sTrendRsiPlot,											color = FusTTrendDirection == 1 ? color.new(sTrendColorDown, 90) : color.new(sTrendColorUp, 90),	title = "Zona de Tendencia")
+fill(sTrendSupertrendPlot, sTrendRsiPlot, sTrendRsiValue, sTrendRsiSupertrend, color.new(chart.bg_color, 1000),		FusTTrendDirection == 1 ? sTrendColorDown : sTrendColorUp)
+
+/// ─── Crossover & CrossUnder Signal
+plotshape(ta.crossover(sTrendRsiSupertrend, sTrendRsiValue)		and sTrendRsiSupertrend > 70 ? 85 : na,	style = shape.triangledown,	location = location.absolute,	color = sTrendColorDown,	size = size.tiny,	title = "▼")
+plotshape(ta.crossunder(sTrendRsiSupertrend, sTrendRsiValue)	and sTrendRsiSupertrend < 30 ? 15 : na,	style = shape.triangleup,	location = location.absolute,	color = sTrendColorUp,		size = size.tiny,	title = "▲")
+
+//// ─────────────────────────────────────────────────────────────────────
+//// ─────────────────────────────────────────────────────────────────────
+//// ─────────────────────────────────────────────────────────────────────
+
+/// ╔═══════════════════════════╗
+/// ║  Tsi & Divergences		║
+/// ║ 	@	Allen	㔬			║
+/// ╚═══════════════════════════╝
+
+//// ───────────────────────
+/// ─── Vars ───
+//// ───────────────────────
+
+/// ─── Colors ───
+tsiDivColorBaseBull					= PlatziGreen30
+tsiDivColorBaseBear					= VictSecFucsia50
+
+tsiDivColorBull						= PlatziGreen30
+tsiDivColorBear						= VictSecFucsia50
+tsiDivColorShapeBull				= color.new(AllenMint60,		20)
+tsiDivColorShapeBear				= color.new(AllenSky10,			20)
+tsiDivColorHiddenBull				= color.new(PlatziGreen40,		30)
+tsiDivColorHiddenBear				= color.new(WavBehFucsia50,		30)
+tsiDivColorText						= color.new(PlatziBlue70,		0)
+tsiDivColorNone						= color.new(AllenSky10,			100)
+tsiDivColorTSI						= color.new(AllenSky10,			20)
+
+/// ─── Inputs ───
+tsiDivInputLong						= input(defval = 6,		title = 'Longitud de Compra')
+tsiDivInputShort					= input(defval = 13,	title = 'Longitud de Venta')
+tsiDivInputSignal					= input(defval = 4,		title = 'Longitud de la SEÑAL')
+
+tsiDivInputPrice					= close[0]
+
+/// ─── divergences ───
+tsiDivDiverLBR						= input(defval = 5,		title = 'Corrección a la derecha')
+tsiDivDiverLBL						= input(defval = 5,		title = 'Corrección a la izquierda')
+tsiDivDiverRangeUpper				= input(defval = 30,	title = 'Rango de corrección maximo')
+tsiDivDiverRangeLower				= input(defval = 2,		title = 'Rango de corrección minimo')
+
+/// ─── Show ───
+tsiDivShowPlotBull					= input(defval = true,	title = 'Mostrar Divergencia Alcista')
+tsiDivShowPlotHiddenBull			= input(defval = true,	title = 'Mostrar Divergencia scalp Alcista')
+tsiDivShowPlotBear					= input(defval = true,	title = 'Mostrar Divergencia Bajista')
+tsiDivShowPlotHiddenBear			= input(defval = true,	title = 'Mostrar Divergencia scalp Bajista')
+tsiDivShowCloudOn					= input(defval = true,	title = 'TSI Cloud')
+tsiDivShowTSI						= input(defval = false,	title = 'TSI')
+
+//// ───────────────────────
+/// ─── Tsi ───
+/// ─── Functions ───
+//// ───────────────────────
+
+double_smooth(src, tsiDivInputLong, tsiDivInputShort) =>
+	fist_smooth = ta.ema(src, tsiDivInputLong)
+	ta.ema(fist_smooth, tsiDivInputShort)
+
+tsiDiFuPC							= ta.change(tsiDivInputPrice)
+tsiDiFuDouble_smoothed_price		= double_smooth(tsiDiFuPC, tsiDivInputLong, tsiDivInputShort)
+tsiDiFuDouble_smoothed_abs_price	= double_smooth(math.abs(tsiDiFuPC), tsiDivInputLong, tsiDivInputShort)
+tsiDiFuTsi_value					= 80 * (tsiDiFuDouble_smoothed_price / tsiDiFuDouble_smoothed_abs_price) + 50
+tsiDiFuLagLine						= ta.ema(tsiDiFuTsi_value, tsiDivInputSignal)
+
+/// ─── Plot data ───
+tsiDiFuFillColor					= tsiDivShowCloudOn and tsiDiFuTsi_value > tsiDiFuLagLine ? tsiDivColorBull : tsiDivShowCloudOn and tsiDiFuTsi_value <= tsiDiFuLagLine ? tsiDivColorBear : na
+
+plot(tsiDiFuTsi_value,	color = color.new(PlatziBlue70, 60),	linewidth = 6)
+plot(ta.ema(tsiDiFuTsi_value,	tsiDivInputSignal),	color = color.new(PlatziBlue70, 60),	linewidth = 6)
+tsiDiFuLine1						= plot(tsiDiFuTsi_value,	color = color.new(tsiDiFuFillColor, 35),	linewidth = 2)
+tsiDiFuLine2						= plot(ta.ema(tsiDiFuTsi_value,	tsiDivInputSignal),	color = color.new(tsiDiFuFillColor, 35),	linewidth = 2)
+
+/// ─── Colour fill ───
+tsiDiFuCloudColor					= tsiDivShowCloudOn and tsiDiFuTsi_value > tsiDiFuLagLine ? tsiDivColorBaseBull : tsiDivShowCloudOn and tsiDiFuTsi_value <= tsiDiFuLagLine ? tsiDivColorBaseBear : na
+
+fill(tsiDiFuLine1,	tsiDiFuLine2,	color = color.new(tsiDiFuCloudColor, 55))
+
+tsiDiFuTSI							= tsiDiFuTsi_value
+tsiDiFuOSC							= tsiDiFuTSI
+
+tsiDiFuPLFound						= na(ta.pivotlow(tsiDiFuOSC, tsiDivDiverLBL, tsiDivDiverLBR)) ? false : true
+tsiDiFuPHFound						= na(ta.pivothigh(tsiDiFuOSC, tsiDivDiverLBL, tsiDivDiverLBR)) ? false : true
+
+_inRange(cond) =>
+	tsiDiFuBars						= ta.barssince(cond == true)
+	tsiDivDiverRangeLower			<= tsiDiFuBars and tsiDiFuBars <= tsiDivDiverRangeUpper
+
+//// ───────────────────────
+/// ─── Tsi ───
+/// ─── Show Divergences
+//// ───────────────────────
+
+//// ───────────────────────
+/// ─── Regular Bullish ───
+//// ───────────────────────
+
+/// ─── Osc: Higher Low ───
+tsiDiInsOSCHL						= tsiDiFuOSC[tsiDivDiverLBR] > ta.valuewhen(tsiDiFuPLFound, tsiDiFuOSC[tsiDivDiverLBR], 1) and _inRange(tsiDiFuPLFound[1])
+
+/// ─── Price: Lower Low ───
+tsiDiInsPRICELL						= low[tsiDivDiverLBR] < ta.valuewhen(tsiDiFuPLFound, low[tsiDivDiverLBR], 1)
+
+tsiDiInsBULLCond					= tsiDivShowPlotBull and tsiDiInsPRICELL and tsiDiInsOSCHL and tsiDiFuPLFound
+
+plot(tsiDiFuPLFound ? tsiDiFuOSC[tsiDivDiverLBR] : na, offset = -tsiDivDiverLBR, title = 'Confirmacion de Compra', linewidth = 2, color = tsiDiInsBULLCond ? tsiDivColorShapeBull : tsiDivColorNone)
+
+plotshape(tsiDiInsBULLCond ? tsiDiFuOSC[tsiDivDiverLBR] : na, offset = -tsiDivDiverLBR, title = 'Etiqueta de Compra', text = ' Compra ', style = shape.labelup, location = location.absolute, color = tsiDivColorShapeBull, textcolor = tsiDivColorText)
+
+//// ───────────────────────
+/// ─── Hidden Bullish ───
+//// ───────────────────────
+
+/// ─── Osc: Lower Low ───
+tsiDiInsOSCLL						= tsiDiFuOSC[tsiDivDiverLBR] < ta.valuewhen(tsiDiFuPLFound, tsiDiFuOSC[tsiDivDiverLBR], 1) and _inRange(tsiDiFuPLFound[1])
+
+/// ─── Price: Higher Low ───
+tsiDiInsPRICEHL = low[tsiDivDiverLBR] > ta.valuewhen(tsiDiFuPLFound, low[tsiDivDiverLBR], 1)
+
+tsiDiInsHiddenBullCond				= tsiDivShowPlotHiddenBull and tsiDiInsPRICEHL and tsiDiInsOSCLL and tsiDiFuPLFound
+
+plot(tsiDiFuPLFound ? tsiDiFuOSC[tsiDivDiverLBR] : na, offset = -tsiDivDiverLBR, title = 'Confirmación de Compra scalp', linewidth = 2, color = tsiDiInsHiddenBullCond ? tsiDivColorShapeBull : tsiDivColorNone)
+
+plotshape(tsiDiInsHiddenBullCond ? tsiDiFuOSC[tsiDivDiverLBR] : na, offset = -tsiDivDiverLBR, title = 'Etiqueta de Compra scalp', text = ' Trend ▲ ', style = shape.labelup, location = location.absolute, color=tsiDivColorShapeBull, textcolor = tsiDivColorText)
+
+//// ───────────────────────
+/// ─── Regular Bearish ───
+//// ───────────────────────
+
+/// ─── Osc: Lower High ───
+tsiDiInsOSCLH						= tsiDiFuOSC[tsiDivDiverLBR] < ta.valuewhen(tsiDiFuPHFound, tsiDiFuOSC[tsiDivDiverLBR], 1) and _inRange(tsiDiFuPHFound[1])
+
+/// ─── Price: Higher High ───
+tsiDiInsPRICEHH						= high[tsiDivDiverLBR] > ta.valuewhen(tsiDiFuPHFound, high[tsiDivDiverLBR], 1)
+
+tsiDiInsBEARCond					= tsiDivShowPlotBear and tsiDiInsPRICEHH and tsiDiInsOSCLH and tsiDiFuPHFound
+
+plot(tsiDiFuPHFound ? tsiDiFuOSC[tsiDivDiverLBR] : na, offset = -tsiDivDiverLBR, title = 'Confirmación de Venta', linewidth = 2, color = tsiDiInsBEARCond ? tsiDivColorShapeBear : tsiDivColorNone)
+
+plotshape(tsiDiInsBEARCond ? tsiDiFuOSC[tsiDivDiverLBR] : na, offset = -tsiDivDiverLBR, title = 'Etiqueta de Venta', text = ' Venta ', style = shape.labeldown, location = location.absolute, color = tsiDivColorShapeBear, textcolor = tsiDivColorText)
+
+//// ───────────────────────
+/// ─── Hidden Bearish ───
+//// ───────────────────────
+
+/// ─── Osc: Higher High ───
+tsiDiInsOSCHH						= tsiDiFuOSC[tsiDivDiverLBR] > ta.valuewhen(tsiDiFuPHFound, tsiDiFuOSC[tsiDivDiverLBR], 1) and _inRange(tsiDiFuPHFound[1])
+
+/// ─── Price: Lower High ───
+tsiDiInsPRICELH						= high[tsiDivDiverLBR] < ta.valuewhen(tsiDiFuPHFound, high[tsiDivDiverLBR], 1)
+
+tsiDiInsHiddenBearCond				= tsiDivShowPlotHiddenBear and tsiDiInsPRICELH and tsiDiInsOSCHH and tsiDiFuPHFound
+
+plot(tsiDiFuPHFound ? tsiDiFuOSC[tsiDivDiverLBR] : na, offset = -tsiDivDiverLBR, title = 'Confirmación de Venta scalp', linewidth = 2, color = tsiDiInsHiddenBearCond ? tsiDivColorShapeBear : tsiDivColorNone)
+
+plotshape(tsiDiInsHiddenBearCond ? tsiDiFuOSC[tsiDivDiverLBR] : na, offset = -tsiDivDiverLBR, title = 'Etiqueta de Venta scalp', text = ' Trend ▼ ', style = shape.labeldown, location = location.absolute, color = tsiDivColorShapeBear, textcolor = tsiDivColorText)
+
+//// ─────────────────────────────────────────────────────────────────────

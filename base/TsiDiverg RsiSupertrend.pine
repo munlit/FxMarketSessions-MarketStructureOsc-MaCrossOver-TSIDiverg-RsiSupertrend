@@ -1,0 +1,324 @@
+/// ╔═══════════════════════════╗
+/// ║  Tsi & Divergences		║
+/// ╔═══════════════════════════╗
+/// ║ 	RSI Supertrend			║
+/// ║ 	@	Allen	㔬			║
+/// ╚═══════════════════════════╝
+
+//@version=5
+indicator('TSI Diverg & Rsi Supertrend [@Allen.]',
+	  shorttitle				= 'TSIDiv & Rsitrend',
+	  overlay					= false,
+	  format					= format.price,
+	  precision					= 4,
+	  timeframe					= "")
+
+//// ─────────────────────────────────────────────────────────────────────
+
+AmeTrGrayNickel							= #F1F1F1
+ARoPrimary								= #0035FF
+BrLiYel10								= #FBFD73
+BrLiYel30								= #FDF43C
+WavBehPink20							= #FFB7FF
+WavBehFucsia50							= #DF36DF
+VictSecPink50							= #E651CD
+VictSecFucsia50							= #EA1889
+PlatziGreen30							= #ADEB42
+PlatziGreen40							= #85C638
+PlatziBlue70							= #121F3D
+PlatziBlue50							= #24385B
+AllenSky10								= #CCF8FF
+AllenMint60								= #33FFAC
+AllenWine60								= #E8114B
+
+//// ─────────────────────────────────────────────────────────────────────
+
+/// ╔═══════════════════════════╗
+/// ║ 	RSI Supertrend			║
+/// ║ 	@	Allen	㔬			║
+/// ╚═══════════════════════════╝
+
+//// ─────────────────────────────────────────────────────────────────────
+
+sTrendColorUp					= input.color(AllenMint60,				title = "Compra")
+sTrendColorDown					= input.color(AllenSky10,				title = "Venta")
+sTrendColorBase					= input.color(ARoPrimary,				title = "Marcas de SC / SV")
+sTrendColorMa					= input		(BrLiYel10,					title = "Area Media")
+sTrendColorRSI					= input		(BrLiYel10,					title = "RSI")
+
+//// ───────────────────────
+/// ─── Supertrend Rsi
+/// ─── Variables ────
+//// ───────────────────────
+
+sTrendShowSuperT				= input.bool	(defval = true,			title = "Visualizar Supertrend",	group = "RSI Settings")
+
+sTrendRSILength					= input.int		(defval = 14,			title = "Longitud RSI",				group = "RSI Settings")
+sTrendSmoothingLength			= input.int		(defval = 21,			title = "Longitud RSI Suavisado",	group = "RSI Settings")
+sTrendIShowSmoothed				= input.bool	(defval = false,		title = "Suavisado RSI",			group = "RSI Settings")
+
+sTrendMovingAverageLength		= input.int		(defval = 14,			title = "Longitud MA",				group = "MA Settings",			display = display.data_window)
+sTrendMovingAverageType			= input.string	(defval = "HMA",		title = "Tipo MA",					group = "MA Settings",			options = ["SMA", "HMA", "EMA", "SMMA", "WMA", "VWMA"],	display = display.data_window)
+sTrendShowMovingAverage			= input.bool	(defval = true,			title = "Visualizar RSI MA",		group = "MA Settings")
+
+sTrendFactor					= input.float	(defval = 0.8,			title = "Factor",					group = "Super Trend Settings")
+sTrendAverageTrueRangeLength	= input.int		(defval = 10,			title = "Longitud ATR",				group = "Super Trend Settings")
+
+//// ───────────────────────
+/// ─── Types ───
+//// ───────────────────────
+
+type OHL
+	float O = open
+	float H = high
+	float L = low
+	float C = close
+	float V = volume
+	int   I = bar_index
+
+/// ───────────────────────
+/// ─── Instances
+/// ───────────────────────
+
+ohl = OHL.new()
+
+//// ───────────────────────
+/// ─── Supertrend Rsi
+/// ─── Funciones ────
+//// ───────────────────────
+
+/// ─── ma function
+FusTrendCalculateMA(source, length, type) =>
+	switch type
+		"SMA"	=> ta.sma	(source, length)
+		"HMA"	=> ta.hma	(source, length)
+		"EMA"	=> ta.ema	(source, length)
+		"SMMA"	=> ta.rma	(source, length)
+		"WMA"	=> ta.wma	(source, length)
+		"VWMA"	=> ta.vwma	(source, length)
+
+/// ─── Calculo ATR
+FusTrendCalculateATR(source, atrLength) =>
+	FusTHighestHigh	= ta.highest(source, atrLength)
+	FusTLowestLow	= ta.lowest(source, atrLength)
+	FusTTrueRange	= na(FusTHighestHigh[1]) ? FusTHighestHigh - FusTLowestLow : math.max(FusTHighestHigh - FusTLowestLow, math.abs(FusTHighestHigh - source[1]), math.abs(FusTLowestLow - source[1]))
+	ta.rma(FusTTrueRange, atrLength)
+
+//// ───────────────────────
+/// ─── Supertrend Rsi
+/// ─── Math ─────────
+//// ───────────────────────
+
+/// ─── Function to calculate Supertrend
+FusTrendCalculateSupertrend(factor, ATRLength, source) =>
+	FusTPriceSource						= source
+	FusTATR								= FusTrendCalculateATR(source, ATRLength)
+	FusTUpperBand						= FusTPriceSource + factor * FusTATR
+	FusTLowerBand						= FusTPriceSource - factor * FusTATR
+	FusTPrevLowerBand					= nz(FusTLowerBand[1])
+	FusTPrevUpperBand					= nz(FusTUpperBand[1])
+	FusTLowerBand						:= FusTLowerBand > FusTPrevLowerBand or source[1] < FusTPrevLowerBand ? FusTLowerBand : FusTPrevLowerBand
+	FusTUpperBand						:= FusTUpperBand < FusTPrevUpperBand or source[1] > FusTPrevUpperBand ? FusTUpperBand : FusTPrevUpperBand
+	int FusTTrendDirection				= na
+	float FusTSupertrendValue			= na
+	FusTPrevSupertrend					= FusTSupertrendValue[1]
+	if na(FusTATR[1])
+		FusTTrendDirection				:= 1
+	else if FusTPrevSupertrend			== FusTPrevUpperBand
+		FusTTrendDirection				:= source > FusTUpperBand ? -1 : 1
+	else
+		FusTTrendDirection				:= source < FusTLowerBand ? 1 : -1
+	FusTSupertrendValue					:= FusTTrendDirection == -1 ? FusTLowerBand : FusTUpperBand
+	[FusTSupertrendValue, FusTTrendDirection]
+
+/// ─── Calculete Rsi ───────
+sTrendRsiValue							= sTrendIShowSmoothed and sTrendShowSuperT ? ta.hma(ta.rsi(ohl.C, sTrendRSILength), sTrendSmoothingLength) : ta.rsi(ohl.C, sTrendRSILength)
+sTrendRsiMovingAverage					= FusTrendCalculateMA(sTrendRsiValue, sTrendMovingAverageLength, sTrendMovingAverageType)
+
+/// ─── Calculating Supertrend based on RSI values
+[sTrendRsiSupertrend, FusTTrendDirection] = FusTrendCalculateSupertrend(sTrendFactor, sTrendAverageTrueRangeLength, sTrendRsiValue)
+
+//// ───────────────────────
+/// ─── Supertrend Rsi
+/// ─── Visual ───────
+//// ───────────────────────
+
+/// ─── Plot RSI / MA
+sTrendSupertrendPlot					= plot(sTrendRsiSupertrend,					color = FusTTrendDirection == -1 ? sTrendColorUp : sTrendColorDown,						title = "Supertrend")
+sTrendRsiPlot							= plot(sTrendRsiValue,						color = FusTTrendDirection == -1 ? sTrendColorUp : sTrendColorDown,		linewidth = 2,	title = "")
+
+/// ─── Lines OverBought /OverSold
+plot(80,								color = color.from_gradient(sTrendRsiValue, 60, 80, color.new(sTrendColorBase, 73),		color.new(sTrendColorDown, 0)),					title = "",		linewidth = 6,	editable = false)
+plot(20,								color = color.from_gradient(sTrendRsiValue, 20, 40, color.new(sTrendColorUp, 0),		color.new(sTrendColorBase, 73)),				title = "",		linewidth = 6,	editable = false)
+
+plot(75,								color = color.from_gradient(sTrendRsiValue, 60, 75, color.new(sTrendColorBase, 73),		color.new(sTrendColorDown, 0)),					title = "",		linewidth = 8,	editable = false)
+plot(25,								color = color.from_gradient(sTrendRsiValue, 25, 40, color.new(sTrendColorUp, 0),		color.new(sTrendColorBase, 73)),				title = "",		linewidth = 8,	editable = false)
+
+plot(70,								color = color.from_gradient(sTrendRsiValue, 50, 70, color.new(sTrendColorBase, 73),		color.new(sTrendColorDown, 0)),					title = "",		linewidth = 6,	editable = false)
+plot(30,								color = color.from_gradient(sTrendRsiValue, 30, 50, color.new(sTrendColorUp, 0),		color.new(sTrendColorBase, 73)),				title = "",		linewidth = 6,	editable = false)
+
+
+/// ─── Filling ───────
+fill(sTrendSupertrendPlot, sTrendRsiPlot,											color = FusTTrendDirection == 1 ? color.new(sTrendColorDown, 90) : color.new(sTrendColorUp, 90),	title = "Zona de Tendencia")
+fill(sTrendSupertrendPlot, sTrendRsiPlot, sTrendRsiValue, sTrendRsiSupertrend, color.new(chart.bg_color, 1000),		FusTTrendDirection == 1 ? sTrendColorDown : sTrendColorUp)
+
+/// ─── Crossover & CrossUnder Signal
+plotshape(ta.crossover(sTrendRsiSupertrend, sTrendRsiValue)		and sTrendRsiSupertrend > 70 ? 85 : na,	style = shape.triangledown,	location = location.absolute,	color = sTrendColorDown,	size = size.tiny,	title = "▼")
+plotshape(ta.crossunder(sTrendRsiSupertrend, sTrendRsiValue)	and sTrendRsiSupertrend < 30 ? 15 : na,	style = shape.triangleup,	location = location.absolute,	color = sTrendColorUp,		size = size.tiny,	title = "▲")
+
+//// ─────────────────────────────────────────────────────────────────────
+//// ─────────────────────────────────────────────────────────────────────
+//// ─────────────────────────────────────────────────────────────────────
+
+/// ╔═══════════════════════════╗
+/// ║  Tsi & Divergences		║
+/// ║ 	@	Allen	㔬			║
+/// ╚═══════════════════════════╝
+
+//// ───────────────────────
+/// ─── Vars ───
+//// ───────────────────────
+
+/// ─── Colors ───
+tsiDivColorBaseBull					= PlatziGreen30
+tsiDivColorBaseBear					= VictSecFucsia50
+
+tsiDivColorBull						= PlatziGreen30
+tsiDivColorBear						= VictSecFucsia50
+tsiDivColorShapeBull				= color.new(AllenMint60,		20)
+tsiDivColorShapeBear				= color.new(AllenSky10,			20)
+tsiDivColorHiddenBull				= color.new(PlatziGreen40,		30)
+tsiDivColorHiddenBear				= color.new(WavBehFucsia50,		30)
+tsiDivColorText						= color.new(PlatziBlue70,		0)
+tsiDivColorNone						= color.new(AllenSky10,			100)
+tsiDivColorTSI						= color.new(AllenSky10,			20)
+
+/// ─── Inputs ───
+tsiDivInputLong						= input(defval = 6,		title = 'Longitud de Compra')
+tsiDivInputShort					= input(defval = 13,	title = 'Longitud de Venta')
+tsiDivInputSignal					= input(defval = 4,		title = 'Longitud de la SEÑAL')
+
+tsiDivInputPrice					= close[0]
+
+/// ─── divergences ───
+tsiDivDiverLBR						= input(defval = 5,		title = 'Corrección a la derecha')
+tsiDivDiverLBL						= input(defval = 5,		title = 'Corrección a la izquierda')
+tsiDivDiverRangeUpper				= input(defval = 30,	title = 'Rango de corrección maximo')
+tsiDivDiverRangeLower				= input(defval = 2,		title = 'Rango de corrección minimo')
+
+/// ─── Show ───
+tsiDivShowPlotBull					= input(defval = true,	title = 'Mostrar Divergencia Alcista')
+tsiDivShowPlotHiddenBull			= input(defval = true,	title = 'Mostrar Divergencia scalp Alcista')
+tsiDivShowPlotBear					= input(defval = true,	title = 'Mostrar Divergencia Bajista')
+tsiDivShowPlotHiddenBear			= input(defval = true,	title = 'Mostrar Divergencia scalp Bajista')
+tsiDivShowCloudOn					= input(defval = true,	title = 'TSI Cloud')
+tsiDivShowTSI						= input(defval = false,	title = 'TSI')
+
+//// ───────────────────────
+/// ─── Tsi ───
+/// ─── Functions ───
+//// ───────────────────────
+
+double_smooth(src, tsiDivInputLong, tsiDivInputShort) =>
+	fist_smooth = ta.ema(src, tsiDivInputLong)
+	ta.ema(fist_smooth, tsiDivInputShort)
+
+tsiDiFuPC							= ta.change(tsiDivInputPrice)
+tsiDiFuDouble_smoothed_price		= double_smooth(tsiDiFuPC, tsiDivInputLong, tsiDivInputShort)
+tsiDiFuDouble_smoothed_abs_price	= double_smooth(math.abs(tsiDiFuPC), tsiDivInputLong, tsiDivInputShort)
+tsiDiFuTsi_value					= 80 * (tsiDiFuDouble_smoothed_price / tsiDiFuDouble_smoothed_abs_price) + 50
+tsiDiFuLagLine						= ta.ema(tsiDiFuTsi_value, tsiDivInputSignal)
+
+/// ─── Plot data ───
+tsiDiFuFillColor					= tsiDivShowCloudOn and tsiDiFuTsi_value > tsiDiFuLagLine ? tsiDivColorBull : tsiDivShowCloudOn and tsiDiFuTsi_value <= tsiDiFuLagLine ? tsiDivColorBear : na
+
+plot(tsiDiFuTsi_value,	color = color.new(PlatziBlue70, 60),	linewidth = 6)
+plot(ta.ema(tsiDiFuTsi_value,	tsiDivInputSignal),	color = color.new(PlatziBlue70, 60),	linewidth = 6)
+tsiDiFuLine1						= plot(tsiDiFuTsi_value,	color = color.new(tsiDiFuFillColor, 35),	linewidth = 2)
+tsiDiFuLine2						= plot(ta.ema(tsiDiFuTsi_value,	tsiDivInputSignal),	color = color.new(tsiDiFuFillColor, 35),	linewidth = 2)
+
+/// ─── Colour fill ───
+tsiDiFuCloudColor					= tsiDivShowCloudOn and tsiDiFuTsi_value > tsiDiFuLagLine ? tsiDivColorBaseBull : tsiDivShowCloudOn and tsiDiFuTsi_value <= tsiDiFuLagLine ? tsiDivColorBaseBear : na
+
+fill(tsiDiFuLine1,	tsiDiFuLine2,	color = color.new(tsiDiFuCloudColor, 55))
+
+tsiDiFuTSI							= tsiDiFuTsi_value
+tsiDiFuOSC							= tsiDiFuTSI
+
+tsiDiFuPLFound						= na(ta.pivotlow(tsiDiFuOSC, tsiDivDiverLBL, tsiDivDiverLBR)) ? false : true
+tsiDiFuPHFound						= na(ta.pivothigh(tsiDiFuOSC, tsiDivDiverLBL, tsiDivDiverLBR)) ? false : true
+
+_inRange(cond) =>
+	tsiDiFuBars						= ta.barssince(cond == true)
+	tsiDivDiverRangeLower			<= tsiDiFuBars and tsiDiFuBars <= tsiDivDiverRangeUpper
+
+//// ───────────────────────
+/// ─── Tsi ───
+/// ─── Show Divergences
+//// ───────────────────────
+
+//// ───────────────────────
+/// ─── Regular Bullish ───
+//// ───────────────────────
+
+/// ─── Osc: Higher Low ───
+tsiDiInsOSCHL						= tsiDiFuOSC[tsiDivDiverLBR] > ta.valuewhen(tsiDiFuPLFound, tsiDiFuOSC[tsiDivDiverLBR], 1) and _inRange(tsiDiFuPLFound[1])
+
+/// ─── Price: Lower Low ───
+tsiDiInsPRICELL						= low[tsiDivDiverLBR] < ta.valuewhen(tsiDiFuPLFound, low[tsiDivDiverLBR], 1)
+
+tsiDiInsBULLCond					= tsiDivShowPlotBull and tsiDiInsPRICELL and tsiDiInsOSCHL and tsiDiFuPLFound
+
+plot(tsiDiFuPLFound ? tsiDiFuOSC[tsiDivDiverLBR] : na, offset = -tsiDivDiverLBR, title = 'Confirmacion de Compra', linewidth = 2, color = tsiDiInsBULLCond ? tsiDivColorShapeBull : tsiDivColorNone)
+
+plotshape(tsiDiInsBULLCond ? tsiDiFuOSC[tsiDivDiverLBR] : na, offset = -tsiDivDiverLBR, title = 'Etiqueta de Compra', text = ' Compra ', style = shape.labelup, location = location.absolute, color = tsiDivColorShapeBull, textcolor = tsiDivColorText)
+
+//// ───────────────────────
+/// ─── Hidden Bullish ───
+//// ───────────────────────
+
+/// ─── Osc: Lower Low ───
+tsiDiInsOSCLL						= tsiDiFuOSC[tsiDivDiverLBR] < ta.valuewhen(tsiDiFuPLFound, tsiDiFuOSC[tsiDivDiverLBR], 1) and _inRange(tsiDiFuPLFound[1])
+
+/// ─── Price: Higher Low ───
+tsiDiInsPRICEHL = low[tsiDivDiverLBR] > ta.valuewhen(tsiDiFuPLFound, low[tsiDivDiverLBR], 1)
+
+tsiDiInsHiddenBullCond				= tsiDivShowPlotHiddenBull and tsiDiInsPRICEHL and tsiDiInsOSCLL and tsiDiFuPLFound
+
+plot(tsiDiFuPLFound ? tsiDiFuOSC[tsiDivDiverLBR] : na, offset = -tsiDivDiverLBR, title = 'Confirmación de Compra scalp', linewidth = 2, color = tsiDiInsHiddenBullCond ? tsiDivColorShapeBull : tsiDivColorNone)
+
+plotshape(tsiDiInsHiddenBullCond ? tsiDiFuOSC[tsiDivDiverLBR] : na, offset = -tsiDivDiverLBR, title = 'Etiqueta de Compra scalp', text = ' Trend ▲ ', style = shape.labelup, location = location.absolute, color=tsiDivColorShapeBull, textcolor = tsiDivColorText)
+
+//// ───────────────────────
+/// ─── Regular Bearish ───
+//// ───────────────────────
+
+/// ─── Osc: Lower High ───
+tsiDiInsOSCLH						= tsiDiFuOSC[tsiDivDiverLBR] < ta.valuewhen(tsiDiFuPHFound, tsiDiFuOSC[tsiDivDiverLBR], 1) and _inRange(tsiDiFuPHFound[1])
+
+/// ─── Price: Higher High ───
+tsiDiInsPRICEHH						= high[tsiDivDiverLBR] > ta.valuewhen(tsiDiFuPHFound, high[tsiDivDiverLBR], 1)
+
+tsiDiInsBEARCond					= tsiDivShowPlotBear and tsiDiInsPRICEHH and tsiDiInsOSCLH and tsiDiFuPHFound
+
+plot(tsiDiFuPHFound ? tsiDiFuOSC[tsiDivDiverLBR] : na, offset = -tsiDivDiverLBR, title = 'Confirmación de Venta', linewidth = 2, color = tsiDiInsBEARCond ? tsiDivColorShapeBear : tsiDivColorNone)
+
+plotshape(tsiDiInsBEARCond ? tsiDiFuOSC[tsiDivDiverLBR] : na, offset = -tsiDivDiverLBR, title = 'Etiqueta de Venta', text = ' Venta ', style = shape.labeldown, location = location.absolute, color = tsiDivColorShapeBear, textcolor = tsiDivColorText)
+
+//// ───────────────────────
+/// ─── Hidden Bearish ───
+//// ───────────────────────
+
+/// ─── Osc: Higher High ───
+tsiDiInsOSCHH						= tsiDiFuOSC[tsiDivDiverLBR] > ta.valuewhen(tsiDiFuPHFound, tsiDiFuOSC[tsiDivDiverLBR], 1) and _inRange(tsiDiFuPHFound[1])
+
+/// ─── Price: Lower High ───
+tsiDiInsPRICELH						= high[tsiDivDiverLBR] < ta.valuewhen(tsiDiFuPHFound, high[tsiDivDiverLBR], 1)
+
+tsiDiInsHiddenBearCond				= tsiDivShowPlotHiddenBear and tsiDiInsPRICELH and tsiDiInsOSCHH and tsiDiFuPHFound
+
+plot(tsiDiFuPHFound ? tsiDiFuOSC[tsiDivDiverLBR] : na, offset = -tsiDivDiverLBR, title = 'Confirmación de Venta scalp', linewidth = 2, color = tsiDiInsHiddenBearCond ? tsiDivColorShapeBear : tsiDivColorNone)
+
+plotshape(tsiDiInsHiddenBearCond ? tsiDiFuOSC[tsiDivDiverLBR] : na, offset = -tsiDivDiverLBR, title = 'Etiqueta de Venta scalp', text = ' Trend ▼ ', style = shape.labeldown, location = location.absolute, color = tsiDivColorShapeBear, textcolor = tsiDivColorText)
+
+//// ─────────────────────────────────────────────────────────────────────
